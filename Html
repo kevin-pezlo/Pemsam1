@@ -1,0 +1,137 @@
+// codigo de HTML:
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEMSAM - Juegos Educativos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="pet" id="interactivePet"></div>
+    
+    <header>
+        <div class="logo">PEMSAM</div>
+    </header>
+    
+    <nav>
+        <a href="#inicio">INICIO</a>
+        <a href="#juegos">JUEGOS</a>
+        <a href="#nosotros">NOSOTROS</a>
+    </nav>
+    
+    <section class="hero" id="inicio">
+        <h1>LA MEJOR PLATAFORMA DE</h1>
+        <p>JUEGOS EDUCATIVOS PARA UN<br>DESARROLLO MOTRIZ ÓPTIMO</p>
+        <a href="#juegos" class="btn">JUGAR AHORA</a>
+    </section>
+    
+    <section class="games-container" id="juegos">
+        <div class="game-card">
+            <h2>Juego de Colores</h2>
+            <p>Presiona el color que se ilumina</p>
+            <button class="game-btn" onclick="openGame('colorGame')">JUGAR</button>
+        </div>
+        
+        <div class="game-card">
+            <h2>Juego de Figuras</h2>
+            <p>Arrastra las figuras</p>
+            <button class="game-btn" onclick="openGame('shapeGame')">JUGAR</button>
+        </div>
+        
+        <div class="game-card">
+            <h2>Memorama</h2>
+            <p>Encuentra las parejas</p>
+            <button class="game-btn" onclick="openGame('memoryGame')">JUGAR</button>
+        </div>
+        
+        <div class="game-card">
+            <h2>Dibujo Libre</h2>
+            <p>Expresa tu creatividad</p>
+            <button class="game-btn" onclick="openGame('drawingGame')">JUGAR</button>
+        </div>
+    </section>
+    
+    <div class="game-screen" id="colorGameScreen">
+        <div class="game-area">
+            <h2>Juego de Colores</h2>
+            <div id="colorGame">
+                <div class="color-option" id="color1"></div>
+                <div class="color-option" id="color2"></div>
+                <div class="color-option" id="color3"></div>
+                <div class="color-option" id="color4"></div>
+            </div>
+            <p id="colorScore">Puntuación: 0</p>
+            <button class="close-btn" onclick="closeGame('colorGameScreen')">CERRAR</button>
+        </div>
+    </div>
+    
+    <div class="game-screen" id="shapeGameScreen">
+        <div class="game-area">
+            <h2>Juego de Figuras</h2>
+            <div id="shapeGame">
+                <div class="shape-container">
+                    <div class="shape" id="circle" draggable="true"></div>
+                    <div class="shape" id="square" draggable="true"></div>
+                    <div class="shape" id="triangle" draggable="true"></div>
+                    <div class="shape" id="star" draggable="true"></div>
+                    
+                    <div class="target" id="circleTarget"></div>
+                    <div class="target" id="squareTarget"></div>
+                    <div class="target" id="triangleTarget"></div>
+                    <div class="target" id="starTarget"></div>
+                </div>
+            </div>
+            <p id="shapeScore">Figuras colocadas: 0/4</p>
+            <button class="close-btn" onclick="closeGame('shapeGameScreen')">CERRAR</button>
+        </div>
+    </div>
+    
+    <div class="game-screen" id="memoryGameScreen">
+        <div class="game-area">
+            <h2>Memorama</h2>
+            <div id="memoryGame">
+                <div class="memory-board" id="memoryBoard"></div>
+                <p id="memoryScore">Parejas: 0/8</p>
+                <button class="reset-btn" onclick="resetMemoryGame()">Reiniciar</button>
+                <button class="close-btn" onclick="closeGame('memoryGameScreen')">CERRAR</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="game-screen" id="drawingGameScreen">
+        <div class="game-area">
+            <h2>Dibujo Libre</h2>
+            <div id="drawingGame">
+                <canvas id="drawingCanvas" class="drawing-area"></canvas>
+                <div class="color-picker">
+                    <span style="background-color: black;"></span>
+                    <span style="background-color: red;"></span>
+                    <span style="background-color: blue;"></span>
+                    <span style="background-color: green;"></span>
+                    <span style="background-color: yellow;"></span>
+                    <span style="background-color: purple;"></span>
+                </div>
+                <div class="brush-size">
+                    <button>Pequeño</button>
+                    <button>Mediano</button>
+                    <button>Grande</button>
+                </div>
+                <button class="clear-btn">Limpiar</button>
+                <button class="close-btn" onclick="closeGame('drawingGameScreen')">CERRAR</button>
+            </div>
+        </div>
+    </div>
+    
+    <section id="nosotros">
+        <h2>NOSOTROS</h2>
+        <p>Plataforma educativa para desarrollo motriz</p>
+    </section>
+    
+    <footer>
+        <p>© 2024 PEMSAM</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
