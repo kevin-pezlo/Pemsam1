@@ -349,7 +349,7 @@ nav a:hover {
     position: fixed;
     width: 100px;
     height: 80px;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80"><path d="M50,20 Q60,0 70,20 Q80,10 90,20 Q95,30 85,40 Q95,50 80,60 Q70,70 50,70 Q30,70 20,60 Q5,50 15,40 Q5,30 10,20 Q20,10 30,20 Q40,0 50,20 Z" fill="%23f1c40f"/><circle cx="35" cy="30" r="5" fill="%23333"/><circle cx="65" cy="30" r="5" fill="%23333"/><path d="M40,45 Q50,55 60,45" stroke="%23333" stroke-width="2" fill="none"/><path d="M30,15 Q35,5 40,15" stroke="%23333" stroke-width="2" fill="none"/><path d="M60,15 Q65,5 70,15" stroke="%23333" stroke-width="2" fill="none"/></svg>');
+    background-image: url(%F0%9F%90%A2);
     background-repeat: no-repeat;
     z-index: 5;
     transition: transform 0.5s ease-out, left 2s linear, top 2s linear;
