@@ -349,8 +349,10 @@ nav a:hover {
     position: fixed;
     width: 100px;
     height: 80px;
-    background-image: url(🐢);
+    background-image: url('https://cdn-0.emojis.wiki/emoji-pics/google/dog-face-google.png');
     background-repeat: no-repeat;
+    background-size: contain; /* Para que la imagen se ajuste al tamaño */
+    background-position: center;
     z-index: 5;
     transition: transform 0.5s ease-out, left 2s linear, top 2s linear;
     pointer-events: none;
