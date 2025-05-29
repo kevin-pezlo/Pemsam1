@@ -291,7 +291,7 @@ function setupPet() {
             if (petState === 'moving') {
                 petTargetX = Math.random() * (window.innerWidth - 100);
                 petTargetY = Math.random() * (window.innerHeight - 100);
-                petSpeed = 2.5 + Math.random() * 1.5;
+                petSpeed = 4.5 + Math.random() * 1.5;
                 petDirection = petTargetX > petX ? 1 : -1;
                 pet.classList.remove('happy', 'curious', 'sleepy');
                 pet.classList.add('running');
@@ -321,7 +321,7 @@ function setupPet() {
                     pet.classList.add('curious');
                     petTargetX = petX - dx * 2;
                     petTargetY = petY - dy * 2;
-                    petSpeed = 2;
+                    petSpeed = 4;
                     petDirection = dx > 0 ? -1 : 1;
                     pet.style.transform = petDirection === 1 ? 'scaleX(1)' : 'scaleX(-1)';
                     pet.classList.add('running');
@@ -331,8 +331,8 @@ function setupPet() {
             }
             
             if (pet.classList.contains('happy')) {
-                petX += (dx / distance) * 0.5;
-                petY += (dy / distance) * 0.5;
+                petX += (dx / distance) * 2.5;
+                petY += (dy / distance) * 2.5;
                 
                 if (dx > 0 && petDirection === -1) {
                     petDirection = 1;
