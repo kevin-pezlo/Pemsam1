@@ -357,7 +357,7 @@ function setupPet() {
         pet.classList.remove('happy', 'curious', 'running', 'sleepy');
         pet.classList.add('happy');
         
-        pet.style.transform = `scaleX(${petDirection}) translateY(-20px)`;
+        pet.style.transform = `scaleX(${petDirection}) translateY(-60px)`;
         setTimeout(() => {
             pet.style.transform = `scaleX(${petDirection}) translateY(0)`;
         }, 300);
