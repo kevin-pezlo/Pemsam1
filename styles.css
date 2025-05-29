@@ -354,13 +354,13 @@ nav a:hover {
     background-size: contain; /* Para que la imagen se ajuste al tamaño */
     background-position: center;
     z-index: 5;
-    transition: transform 0.5s ease-out, left 2s linear, top 2s linear;
+    transition: transform 0.2s ease-out, left 2s linear, top 2s linear;
     pointer-events: none;
     transform-origin: bottom center;
 }
 
 .pet.happy {
-    animation: bounce 0.5s infinite alternate;
+    animation: bounce 0.2s infinite alternate;
 }
 
 .pet.curious {
@@ -373,7 +373,7 @@ nav a:hover {
 }
 
 .pet.running {
-    animation: run 0.3s steps(4) infinite;
+    animation: run 0.2s steps(4) infinite;
 }
 
 @keyframes bounce {
