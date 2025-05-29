@@ -321,7 +321,7 @@ function setupPet() {
                     pet.classList.add('curious');
                     petTargetX = petX - dx * 2;
                     petTargetY = petY - dy * 2;
-                    petSpeed = 4;
+                    petSpeed = 8;
                     petDirection = dx > 0 ? -1 : 1;
                     pet.style.transform = petDirection === 1 ? 'scaleX(1)' : 'scaleX(-1)';
                     pet.classList.add('running');
