@@ -278,113 +278,132 @@ function clearDrawing() {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-const duck = document.getElementById('duck');
-const speed = 3; // pixeles por frame
-let duckPos = { x: 100, y: 100 };
-let targetPos = { x: 100, y: 100 };
-let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-let stealingCursor = false;
-
-// Mueve el pato hacia targetPos
-function moveDuck() {
-  const dx = targetPos.x - duckPos.x;
-  const dy = targetPos.y - duckPos.y;
-  const dist = Math.hypot(dx, dy);
-
-  if (dist > speed) {
-    duckPos.x += (dx / dist) * speed;
-    duckPos.y += (dy / dist) * speed;
-  } else {
-    duckPos.x = targetPos.x;
-    duckPos.y = targetPos.y;
-  }
-
-  duck.style.left = duckPos.x + 'px';
-  duck.style.top = duckPos.y + 'px';
-
-  // Voltea el pato según dirección
-  if (dx > 0) {
-    duck.style.transform = 'scaleX(1)';
-  } else {
-    duck.style.transform = 'scaleX(-1)';
-  }
+// Mascota interactiva
+function setupPet() {
+    updatePetPosition();
+    
+    // Movimiento aleatorio
+    setInterval(() => {
+        if (petState !== 'interacting' && !cursorNearPet) {
+            const states = ['idle', 'moving', 'sleepy'];
+            petState = states[Math.floor(Math.random() * states.length)];
+            
+            if (petState === 'moving') {
+                petTargetX = Math.random() * (window.innerWidth - 100);
+                petTargetY = Math.random() * (window.innerHeight - 100);
+                petSpeed = 4.5 + Math.random() * 1.5;
+                petDirection = petTargetX > petX ? 1 : -1;
+                pet.classList.remove('happy', 'curious', 'sleepy');
+                pet.classList.add('running');
+            } else if (petState === 'sleepy') {
+                pet.classList.remove('happy', 'curious', 'running');
+                pet.classList.add('sleepy');
+                petTimer = 200 + Math.random() * 200;
+            } else {
+                pet.classList.remove('happy', 'curious', 'running', 'sleepy');
+            }
+        }
+    }, 3000);
+    
+    // Interacción con el cursor
+    document.addEventListener('mousemove', (e) => {
+        const dx = e.clientX - petX;
+        const dy = e.clientY - petY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 150) {
+            if (!cursorNearPet) {
+                cursorNearPet = true;
+                petState = 'interacting';
+                pet.classList.remove('running', 'sleepy');
+                
+                if (Math.random() > 0.7) {
+                    pet.classList.add('curious');
+                    petTargetX = petX - dx * 2;
+                    petTargetY = petY - dy * 2;
+                    petSpeed = 8;
+                    petDirection = dx > 0 ? -1 : 1;
+                    pet.style.transform = petDirection === 1 ? 'scaleX(1)' : 'scaleX(-1)';
+                    pet.classList.add('running');
+                } else {
+                    pet.classList.add('happy');
+                }
+            }
+            
+            if (pet.classList.contains('happy')) {
+                petX += (dx / distance) * 2.5;
+                petY += (dy / distance) * 2.5;
+                
+                if (dx > 0 && petDirection === -1) {
+                    petDirection = 1;
+                    pet.style.transform = 'scaleX(1)';
+                } else if (dx < 0 && petDirection === 1) {
+                    petDirection = -1;
+                    pet.style.transform = 'scaleX(-1)';
+                }
+            }
+        } else {
+            if (cursorNearPet) {
+                cursorNearPet = false;
+                petState = 'idle';
+                pet.classList.remove('happy', 'curious', 'running');
+            }
+        }
+    });
+    
+    // Click en la mascota
+    pet.addEventListener('click', () => {
+        petState = 'interacting';
+        pet.classList.remove('happy', 'curious', 'running', 'sleepy');
+        pet.classList.add('happy');
+        
+        pet.style.transform = `scaleX(${petDirection}) translateY(-20px)`;
+        setTimeout(() => {
+            pet.style.transform = `scaleX(${petDirection}) translateY(0)`;
+        }, 300);
+        
+        setTimeout(() => {
+            if (!cursorNearPet) {
+                petState = 'idle';
+                pet.classList.remove('happy');
+            }
+        }, 2000);
+    });
 }
 
-// Genera una posición aleatoria dentro de la ventana
-function randomPosition() {
-  return {
-    x: Math.random() * (window.innerWidth - 80),
-    y: Math.random() * (window.innerHeight - 80),
-  };
-}
-
-// Actualiza targetPos para que el pato siga el cursor si está cerca,
-// o se mueva aleatoriamente si está lejos
-function updateTarget() {
-  const dx = mousePos.x - duckPos.x;
-  const dy = mousePos.y - duckPos.y;
-  const dist = Math.hypot(dx, dy);
-
-  if (!stealingCursor && dist < 150) {
-    // Sigue el cursor
-    targetPos = { x: mousePos.x - 40, y: mousePos.y - 40 };
-  } else if (!stealingCursor && dist >= 150) {
-    // Se mueve aleatoriamente cada cierto tiempo
-    if (Math.random() < 0.02) {
-      targetPos = randomPosition();
+function updatePetPosition() {
+    if (petState === 'moving') {
+        const dx = petTargetX - petX;
+        const dy = petTargetY - petY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > 10) {
+            petX += (dx / distance) * petSpeed;
+            petY += (dy / distance) * petSpeed;
+            
+            if (dx > 0 && petDirection === -1) {
+                petDirection = 1;
+                pet.style.transform = 'scaleX(1)';
+            } else if (dx < 0 && petDirection === 1) {
+                petDirection = -1;
+                pet.style.transform = 'scaleX(-1)';
+            }
+        } else {
+            petState = 'idle';
+            pet.classList.remove('running');
+        }
+    } else if (petState === 'sleepy') {
+        petTimer--;
+        if (petTimer <= 0) {
+            petState = 'idle';
+            pet.classList.remove('sleepy');
+        }
     }
-  }
+    
+    pet.style.left = petX + 'px';
+    pet.style.top = petY + 'px';
+    requestAnimationFrame(updatePetPosition);
 }
-
-// Simula que el pato “roba” el cursor durante 3 segundos
-function stealCursor() {
-  if (stealingCursor) return;
-  stealingCursor = true;
-  const originalCursor = document.body.style.cursor;
-  document.body.style.cursor = 'none';
-
-  let offsetX = 0;
-  let offsetY = 0;
-
-  // El pato se mueve con el cursor (simulado)
-  const moveInterval = setInterval(() => {
-    offsetX += 5;
-    offsetY += 3;
-    targetPos.x = duckPos.x + offsetX;
-    targetPos.y = duckPos.y + offsetY;
-  }, 30);
-
-  setTimeout(() => {
-    clearInterval(moveInterval);
-    stealingCursor = false;
-    document.body.style.cursor = originalCursor;
-    targetPos = randomPosition();
-  }, 3000);
-}
-
-// Evento para actualizar posición del mouse
-window.addEventListener('mousemove', (e) => {
-  mousePos.x = e.clientX;
-  mousePos.y = e.clientY;
-});
-
-// Evento para que el pato “robe” el cursor al hacer click
-duck.addEventListener('click', () => {
-  stealCursor();
-});
-
-// Animación principal
-function animate() {
-  updateTarget();
-  moveDuck();
-  requestAnimationFrame(animate);
-}
-
-// Inicialización
-duck.style.left = duckPos.x + 'px';
-duck.style.top = duckPos.y + 'px';
-animate();
-
 
 // Funciones para abrir/cerrar juegos
 function openGame(gameId) {
