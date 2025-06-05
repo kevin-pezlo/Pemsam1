@@ -437,3 +437,125 @@ function closeGame(gameId) {
         clearInterval(colorInterval);
     }
 }
+// Funciones para el Dibujo Libre (continuación)
+function startDrawing(e) {
+    isDrawing = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = currentDrawingColor;
+    ctx.lineCap = 'round';
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+// Manejo táctil para dibujo
+function handleTouchStart(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = e.target.getBoundingClientRect();
+    const offsetX = touch.clientX - rect.left;
+    const offsetY = touch.clientY - rect.top;
+    isDrawing = true;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+}
+
+function handleTouchMove(e) {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const touch = e.touches[0];
+    const rect = e.target.getBoundingClientRect();
+    const offsetX = touch.clientX - rect.left;
+    const offsetY = touch.clientY - rect.top;
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = currentDrawingColor;
+    ctx.lineCap = 'round';
+    ctx.lineTo(offsetX, offsetY);
+    ctx.stroke();
+}
+
+// Cambiar tamaño del pincel
+function changeBrushSize(size) {
+    brushSize = size;
+}
+
+// Limpiar el canvas
+document.querySelector('.clear-btn').addEventListener('click', () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+});
+
+// Funciones para abrir y cerrar juegos
+function openGame(gameId) {
+    document.querySelectorAll('.game-screen').forEach(screen => {
+        screen.style.display = 'none';
+    });
+    document.getElementById(gameId + 'Screen').style.display = 'flex';
+
+    // Iniciar juego específico si es necesario
+    if (gameId === 'colorGame') startColorGame();
+}
+
+function closeGame(gameScreenId) {
+    document.getElementById(gameScreenId).style.display = 'none';
+
+    // Detener intervalos o reiniciar estados si es necesario
+    if (gameScreenId === 'colorGameScreen') clearInterval(colorInterval);
+}
+
+// Mascota interactiva: movimiento y estados
+function setupPet() {
+    document.addEventListener('mousemove', e => {
+        const rect = pet.getBoundingClientRect();
+        const petCenterX = rect.left + rect.width / 2;
+        const petCenterY = rect.top + rect.height / 2;
+        const distX = e.clientX - petCenterX;
+        const distY = e.clientY - petCenterY;
+        const distance = Math.sqrt(distX * distX + distY * distY);
+
+        cursorNearPet = distance < 150;
+
+        if (cursorNearPet) {
+            petTargetX = e.clientX - rect.width / 2;
+            petTargetY = e.clientY - rect.height / 2;
+            petState = 'curious';
+        } else {
+            petState = 'idle';
+            petTargetX = petX;
+            petTargetY = petY;
+        }
+    });
+
+    animatePet();
+}
+
+function animatePet() {
+    // Mover mascota suavemente hacia el objetivo
+    petX += (petTargetX - petX) * 0.05;
+    petY += (petTargetY - petY) * 0.05;
+
+    pet.style.left = petX + 'px';
+    pet.style.top = petY + 'px';
+
+    // Cambiar clase según estado
+    pet.className = 'pet'; // reset clases
+    if (petState === 'curious') {
+        pet.classList.add('curious');
+    } else if (petState === 'happy') {
+        pet.classList.add('happy');
+    } else if (petState === 'sleepy') {
+        pet.classList.add('sleepy');
+    } else if (petState === 'running') {
+        pet.classList.add('running');
+    }
+
+    requestAnimationFrame(animatePet);
+}
