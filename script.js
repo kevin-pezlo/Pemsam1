@@ -1,5 +1,5 @@
 // Variables globales
-let currentColor = 0;More actions
+let currentColor = 0;
 let colorScore = 0;
 let colorInterval;
 let shapesPlaced = 0;
