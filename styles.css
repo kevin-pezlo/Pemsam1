@@ -1,3 +1,4 @@
+
 /* Estilos generales */
 * {
     margin: 0;
@@ -6,6 +7,7 @@
     font-family: 'Arial', sans-serif;
 }
 
+
 body {
     background-color: #f9f9f9;
     color: #333;
@@ -13,9 +15,10 @@ body {
     overflow-x: hidden;
 }
 
+
 /* Encabezado con franja morada */
 .header {
-    background-color: #2f2152;
+    background-color: #295221;
     color: white;
     padding: 1rem 2rem;
     position: relative;
@@ -24,6 +27,7 @@ body {
     flex-direction: column;
 }
 
+
 .menu-container {
     display: flex;
     justify-content: flex-start;
@@ -31,6 +35,7 @@ body {
     padding: 1rem 0;
     z-index: 100;
 }
+
 
 .hamburger-btn {
     background: none;
@@ -45,6 +50,7 @@ body {
     z-index: 1000;
 }
 
+
 .hamburger-btn span {
     display: block;
     width: 100%;
@@ -52,6 +58,7 @@ body {
     background-color: #f7e259;
     transition: all 0.3s ease;
 }
+
 
 .nav-menu {
     position: fixed;
@@ -65,17 +72,21 @@ body {
     z-index: 999;
 }
 
+
 .nav-menu.active {
     left: 0;
 }
+
 
 .nav-menu ul {
     list-style: none;
 }
 
+
 .nav-menu li {
     margin-bottom: 1.5rem;
 }
+
 
 .nav-menu a {
     color: white;
@@ -84,14 +95,17 @@ body {
     transition: color 0.3s ease;
 }
 
+
 .nav-menu a:hover {
     color: #f7e259;
 }
+
 
 .nav-menu a.active {
     color: #f7e259;
     font-weight: bold;
 }
+
 
 .hero {
     flex: 1;
@@ -103,6 +117,7 @@ body {
     padding: 2rem;
 }
 
+
 .logo {
     font-size: 5rem;
     margin-bottom: 2rem;
@@ -110,10 +125,12 @@ body {
     text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
+
 .play-button-container {
     position: relative;
     margin-top: 2rem;
 }
+
 
 .yellow-circle {
     width: 200px;
@@ -126,6 +143,7 @@ body {
     animation: pulse 2s infinite;
     box-shadow: 0 10px 30px rgba(248, 152, 84, 0.5);
 }
+
 
 .play-button {
     background: none;
@@ -140,9 +158,11 @@ body {
     transition: transform 0.3s ease;
 }
 
+
 .play-button:hover {
     transform: scale(1.05);
 }
+
 
 @keyframes pulse {
     0% {
@@ -159,6 +179,7 @@ body {
     }
 }
 
+
 /* Sección Nosotros */
 .nosotros-section {
     padding: 6rem 2rem;
@@ -166,6 +187,7 @@ body {
     text-align: center;
     position: relative;
 }
+
 
 .nosotros-section::before {
     content: '';
@@ -178,6 +200,7 @@ body {
     background-size: cover;
 }
 
+
 .nosotros-section h2 {
     color: #2f2152;
     margin-bottom: 1.5rem;
@@ -185,6 +208,7 @@ body {
     position: relative;
     display: inline-block;
 }
+
 
 .nosotros-section h2::after {
     content: '';
@@ -198,6 +222,7 @@ body {
     border-radius: 2px;
 }
 
+
 .nosotros-section p {
     max-width: 800px;
     margin: 0 auto;
@@ -206,6 +231,7 @@ body {
     line-height: 1.8;
 }
 
+
 /* Sección de Juegos */
 .games-section {
     padding: 6rem 2rem;
@@ -213,6 +239,7 @@ body {
     text-align: center;
     position: relative;
 }
+
 
 .games-section::before {
     content: '';
@@ -225,6 +252,7 @@ body {
     background-size: cover;
 }
 
+
 .games-section h2 {
     color: #2f2152;
     margin-bottom: 3rem;
@@ -232,6 +260,7 @@ body {
     position: relative;
     display: inline-block;
 }
+
 
 .games-section h2::after {
     content: '';
@@ -245,6 +274,7 @@ body {
     border-radius: 2px;
 }
 
+
 .games-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -252,6 +282,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
 }
+
 
 .game-card {
     background-color: white;
@@ -263,6 +294,7 @@ body {
     overflow: hidden;
 }
 
+
 .game-card::before {
     content: '';
     position: absolute;
@@ -273,10 +305,12 @@ body {
     background: linear-gradient(90deg, #f89854, #f7e259, #3498db);
 }
 
+
 .game-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
+
 
 .game-icon {
     width: 80px;
@@ -291,11 +325,13 @@ body {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+
 .game-card h3 {
     color: #2f2152;
     margin-bottom: 1rem;
     font-size: 1.4rem;
 }
+
 
 .game-card p {
     color: #666;
@@ -303,6 +339,7 @@ body {
     font-size: 1rem;
     min-height: 60px;
 }
+
 
 .play-game-btn {
     background-color: #f89854;
@@ -319,11 +356,13 @@ body {
     letter-spacing: 1px;
 }
 
+
 .play-game-btn:hover {
     background-color: #2f2152;
     transform: translateY(-3px);
     box-shadow: 0 7px 15px rgba(47, 33, 82, 0.3);
 }
+
 
 /* Contenedor de juegos */
 .game-container {
@@ -334,9 +373,11 @@ body {
     position: relative;
 }
 
+
 .game-container.active {
     display: block;
 }
+
 
 .game-header {
     display: flex;
@@ -345,10 +386,12 @@ body {
     margin-bottom: 2rem;
 }
 
+
 .game-title {
     color: #2f2152;
     font-size: 2rem;
 }
+
 
 .back-btn {
     background-color: #f89854;
@@ -361,9 +404,11 @@ body {
     transition: background-color 0.3s ease;
 }
 
+
 .back-btn:hover {
     background-color: #2f2152;
 }
+
 
 /* Pie de página creativo */
 .footer {
@@ -372,6 +417,7 @@ body {
     position: relative;
     padding-top: 100px;
 }
+
 
 .footer-wave {
     position: absolute;
@@ -382,6 +428,7 @@ body {
     overflow: hidden;
 }
 
+
 .footer-wave svg {
     position: absolute;
     top: 0;
@@ -389,6 +436,7 @@ body {
     width: 100%;
     height: 100%;
 }
+
 
 .footer-content {
     display: grid;
@@ -399,9 +447,11 @@ body {
     padding: 0 2rem;
 }
 
+
 .footer-column {
     margin-bottom: 2rem;
 }
+
 
 .footer-column h3 {
     font-size: 1.5rem;
@@ -410,6 +460,7 @@ body {
     padding-bottom: 10px;
     color: #2f2152;
 }
+
 
 .footer-column h3::after {
     content: '';
@@ -421,13 +472,16 @@ body {
     background-color: #f89854;
 }
 
+
 .footer-column ul {
     list-style: none;
 }
 
+
 .footer-column li {
     margin-bottom: 0.8rem;
 }
+
 
 .footer-column a {
     color: #666;
@@ -436,6 +490,7 @@ body {
     display: inline-block;
     position: relative;
 }
+
 
 .footer-column a::after {
     content: '';
@@ -448,13 +503,16 @@ body {
     transition: width 0.3s ease;
 }
 
+
 .footer-column a:hover {
     color: #2f2152;
 }
 
+
 .footer-column a:hover::after {
     width: 100%;
 }
+
 
 .contact-info p {
     margin-bottom: 1rem;
@@ -463,11 +521,13 @@ body {
     color: #666;
 }
 
+
 .contact-info i {
     margin-right: 0.8rem;
     color: #f89854;
     margin-top: 3px;
 }
+
 
 .newsletter p {
     color: #666;
@@ -475,10 +535,12 @@ body {
     line-height: 1.6;
 }
 
+
 .newsletter form {
     display: flex;
     margin-bottom: 1.5rem;
 }
+
 
 .newsletter input {
     flex: 1;
@@ -488,6 +550,7 @@ body {
     font-size: 1rem;
     outline: none;
 }
+
 
 .newsletter button {
     background-color: #f89854;
@@ -500,14 +563,17 @@ body {
     transition: background-color 0.3s ease;
 }
 
+
 .newsletter button:hover {
     background-color: #2f2152;
 }
+
 
 .social-links {
     display: flex;
     gap: 1rem;
 }
+
 
 .social-links a {
     display: flex;
@@ -521,10 +587,12 @@ body {
     transition: all 0.3s ease;
 }
 
+
 .social-links a:hover {
     background-color: #f89854;
     transform: translateY(-3px);
 }
+
 
 .footer-bottom {
     text-align: center;
@@ -537,15 +605,18 @@ body {
     align-items: center;
 }
 
+
 .footer-bottom p {
     color: #666;
     margin-bottom: 1rem;
 }
 
+
 .footer-links {
     display: flex;
     gap: 1.5rem;
 }
+
 
 .footer-links a {
     color: #666;
@@ -554,83 +625,87 @@ body {
     transition: color 0.3s ease;
 }
 
+
 .footer-links a:hover {
     color: #2f2152;
 }
+
 
 /* Responsive */
 @media (max-width: 992px) {
     .logo {
         font-size: 4rem;
     }
-    
+   
     .yellow-circle {
         width: 180px;
         height: 180px;
     }
-    
+   
     .play-button {
         font-size: 1.3rem;
     }
 }
 
+
 @media (max-width: 768px) {
     .logo {
         font-size: 3rem;
     }
-    
+   
     .yellow-circle {
         width: 150px;
         height: 150px;
     }
-    
+   
     .play-button {
         font-size: 1.1rem;
         padding: 0.8rem 1.5rem;
     }
-    
+   
     .nosotros-section, .games-section {
         padding: 4rem 1.5rem;
     }
-    
+   
     .game-card {
         padding: 1.5rem 1rem;
     }
 }
 
+
 @media (max-width: 576px) {
     .logo {
         font-size: 2.5rem;
     }
-    
+   
     .yellow-circle {
         width: 130px;
         height: 130px;
     }
-    
+   
     .play-button {
         font-size: 1rem;
         padding: 0.7rem 1.3rem;
     }
-    
+   
     .footer-content {
         grid-template-columns: 1fr;
     }
-    
+   
     .newsletter form {
         flex-direction: column;
     }
-    
+   
     .newsletter input {
         border-radius: 4px;
         margin-bottom: 0.5rem;
     }
-    
+   
     .newsletter button {
         border-radius: 4px;
         padding: 0.8rem;
     }
-    
+   
     .footer-links {
         flex-direction: column;
         gap: 0.5rem;
