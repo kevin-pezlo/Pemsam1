@@ -5,132 +5,197 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PEMSAM - Juegos Educativos</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="pet" id="interactivePet"></div>
-    
-    <header>
-        <div class="logo">PEMSAM</div>
+    <!-- Encabezado con franja morada -->
+    <header class="header">
+        <div class="menu-container">
+            <button class="hamburger-btn" id="hamburgerBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-menu" id="navMenu">
+                <ul>
+                    <li><a href="#" class="active" style="color: #f7e259;">Inicio</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#juegos">Juegos</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+        
+        <div class="hero">
+            <h1 class="logo">
+                <span style="color: #f89854;">P</span>
+                <span style="color: #f89854;">E</span>
+                <span style="color: #f7e259;">M</span>
+                <span style="color: #f9fefd;">S</span>
+                <span style="color: #f89854;">A</span>
+                <span style="color: #f89854;">M</span>
+            </h1>
+            <div class="play-button-container">
+                <div class="yellow-circle">
+                    <button class="play-button" style="color: #3498db;">JUGAR AHORA</button>
+                </div>
+            </div>
+        </div>
     </header>
-    
-    <nav>
-        <a href="#inicio">INICIO</a>
-        <a href="#juegos">JUEGOS</a>
-        <a href="#nosotros">NOSOTROS</a>
-    </nav>
-    
-    <section class="hero" id="inicio">
-        <h1>LA MEJOR PÁGINA DE</h1>
-        <p>JUEGOS EDUCATIVOS PARA UN<br>DESARROLLO MOTRIZ ÓPTIMO</p>
-        <a href="#juegos" class="btn">JUGAR AHORA</a>
+
+    <!-- Sección Nosotros -->
+    <section id="nosotros" class="nosotros-section">
+        <h2>Nosotros</h2>
+        <p>PEMSAM es una plataforma de juegos educativos diseñada para niños, combinando diversión con aprendizaje. Nuestros juegos están diseñados para desarrollar habilidades motoras, cognitivas y de coordinación mientras los niños se divierten.</p>
     </section>
-    
-    <section class="games-container" id="juegos">
-        <div class="game-card">
-            <h2>Juego de Colores</h2>
-            <p>Presiona el color que se ilumina</p>
-            <button class="game-btn" onclick="openGame('colorGame')">JUGAR</button>
+
+    <!-- Sección de Juegos -->
+    <section id="juegos" class="games-section">
+        <h2>Nuestros Juegos Educativos</h2>
+        
+        <div class="games-grid">
+            <!-- Juego 1: Carrera de Obstáculos -->
+            <div class="game-card">
+                <div class="game-icon" style="background-color: #f7e259;">
+                    <i class="fas fa-running"></i>
+                </div>
+                <h3>Carrera de Obstáculos</h3>
+                <p>Controla un personaje que debe esquivar obstáculos en un curso desafiante.</p>
+                <button class="play-game-btn" data-game="obstacle">Jugar</button>
+            </div>
+            
+            <!-- Juego 2: Puntería -->
+            <div class="game-card">
+                <div class="game-icon" style="background-color: #f89854;">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3>Puntería</h3>
+                <p>Apunta y haz clic en objetos en movimiento para ganar puntos.</p>
+                <button class="play-game-btn" data-game="aim">Jugar</button>
+            </div>
+            
+            <!-- Juego 3: Rompecabezas -->
+            <div class="game-card">
+                <div class="game-icon" style="background-color: #3498db;">
+                    <i class="fas fa-puzzle-piece"></i>
+                </div>
+                <h3>Rompecabezas</h3>
+                <p>Arrastra y suelta piezas para completar la imagen correctamente.</p>
+                <button class="play-game-btn" data-game="puzzle">Jugar</button>
+            </div>
+            
+            <!-- Juego 4: Ascenso al Árbol -->
+            <div class="game-card">
+                <div class="game-icon" style="background-color: #2f2152;">
+                    <i class="fas fa-tree"></i>
+                </div>
+                <h3>Ascenso al Árbol</h3>
+                <p>Presiona teclas para subir en un árbol evitando obstáculos.</p>
+                <button class="play-game-btn" data-game="tree">Jugar</button>
+            </div>
+            
+            <!-- Juego 5: Laberinto -->
+            <div class="game-card">
+                <div class="game-icon" style="background-color: #f7e259;">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h3>Laberinto</h3>
+                <p>Navega a través de un laberinto con el mouse para encontrar la salida.</p>
+                <button class="play-game-btn" data-game="maze">Jugar</button>
+            </div>
+            
+            <!-- Juego 6: Teclado Musical -->
+            <div class="game-card">
+                <div class="game-icon" style="background-color: #f89854;">
+                    <i class="fas fa-music"></i>
+                </div>
+                <h3>Teclado Musical</h3>
+                <p>Presiona teclas específicas para producir sonidos musicales.</p>
+                <button class="play-game-btn" data-game="music">Jugar</button>
+            </div>
+            
+            <!-- Juego 7: Identificación de Animales -->
+            <div class="game-card">
+                <div class="game-icon" style="background-color: #3498db;">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <h3>Identificación de Animales</h3>
+                <p>Presiona la tecla o escribe el nombre del animal que aparece.</p>
+                <button class="play-game-btn" data-game="animals">Jugar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor para los juegos -->
+    <div id="game-container" class="game-container"></div>
+
+    <!-- Pie de página creativo -->
+    <footer id="contacto" class="footer">
+        <div class="footer-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#2f2152"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#2f2152"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#2f2152"></path>
+            </svg>
         </div>
         
-        <div class="game-card">
-            <h2>Juego de Figuras</h2>
-            <p>Arrastra las figuras</p>
-            <button class="game-btn" onclick="openGame('shapeGame')">JUGAR</button>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Explora</h3>
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#juegos">Juegos</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Juegos</h3>
+                <ul>
+                    <li><a href="#" data-game="obstacle">Carrera de Obstáculos</a></li>
+                    <li><a href="#" data-game="aim">Puntería</a></li>
+                    <li><a href="#" data-game="puzzle">Rompecabezas</a></li>
+                    <li><a href="#" data-game="tree">Ascenso al Árbol</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contacto</h3>
+                <div class="contact-info">
+                    <p><i class="fas fa-envelope"></i> contacto@pemsam.com</p>
+                    <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Ciudad Educativa, Calle Aprendizaje 123</p>
+                </div>
+            </div>
+            
+            <div class="footer-column newsletter">
+                <h3>Newsletter</h3>
+                <p>Suscríbete para recibir novedades y nuevos juegos</p>
+                <form id="newsletter-form">
+                    <input type="email" placeholder="Tu correo electrónico" required>
+                    <button type="submit">Suscribirse</button>
+                </form>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
         </div>
         
-        <div class="game-card">
-            <h2>Memorama</h2>
-            <p>Encuentra las parejas</p>
-            <button class="game-btn" onclick="openGame('memoryGame')">JUGAR</button>
-        </div>
-        
-        <div class="game-card">
-            <h2>Dibujo Libre</h2>
-            <p>Expresa tu creatividad</p>
-            <button class="game-btn" onclick="openGame('drawingGame')">JUGAR</button>
-        </div>
-    </section>
-    
-    <div class="game-screen" id="colorGameScreen">
-        <div class="game-area">
-            <h2>Juego de Colores</h2>
-            <div id="colorGame">
-                <div class="color-option" id="color1"></div>
-                <div class="color-option" id="color2"></div>
-                <div class="color-option" id="color3"></div>
-                <div class="color-option" id="color4"></div>
-            </div>
-            <p id="colorScore">Puntuación: 0</p>
-            <button class="close-btn" onclick="closeGame('colorGameScreen')">CERRAR</button>
-        </div>
-    </div>
-    
-    <div class="game-screen" id="shapeGameScreen">
-        <div class="game-area">
-            <h2>Juego de Figuras</h2>
-            <div id="shapeGame">
-                <div class="shape-container">
-                    <div class="shape" id="circle" draggable="true"></div>
-                    <div class="shape" id="square" draggable="true"></div>
-                    <div class="shape" id="triangle" draggable="true"></div>
-                    <div class="shape" id="star" draggable="true"></div>
-                    
-                    <div class="target" id="circleTarget"></div>
-                    <div class="target" id="squareTarget"></div>
-                    <div class="target" id="triangleTarget"></div>
-                    <div class="target" id="starTarget"></div>
-                </div>
-            </div>
-            <p id="shapeScore">Figuras colocadas: 0/4</p>
-            <button class="close-btn" onclick="closeGame('shapeGameScreen')">CERRAR</button>
-        </div>
-    </div>
-    
-    <div class="game-screen" id="memoryGameScreen">
-        <div class="game-area">
-            <h2>Memorama</h2>
-            <div id="memoryGame">
-                <div class="memory-board" id="memoryBoard"></div>
-                <p id="memoryScore">Parejas: 0/8</p>
-                <button class="reset-btn" onclick="resetMemoryGame()">Reiniciar</button>
-                <button class="close-btn" onclick="closeGame('memoryGameScreen')">CERRAR</button>
+        <div class="footer-bottom">
+            <p>&copy; 2023 PEMSAM. Todos los derechos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Política de privacidad</a>
+                <a href="#">Términos de servicio</a>
+                <a href="#">Cookies</a>
             </div>
         </div>
-    </div>
-    
-    <div class="game-screen" id="drawingGameScreen">
-        <div class="game-area">
-            <h2>Dibujo Libre</h2>
-            <div id="drawingGame">
-                <canvas id="drawingCanvas" class="drawing-area"></canvas>
-                <div class="color-picker">
-                    <span style="background-color: black;"></span>
-                    <span style="background-color: red;"></span>
-                    <span style="background-color: blue;"></span>
-                    <span style="background-color: green;"></span>
-                    <span style="background-color: yellow;"></span>
-                    <span style="background-color: purple;"></span>
-                </div>
-                <div class="brush-size">
-                    <button>Pequeño</button>
-                    <button>Mediano</button>
-                    <button>Grande</button>
-                </div>
-                <button class="clear-btn">Limpiar</button>
-                <button class="close-btn" onclick="closeGame('drawingGameScreen')">CERRAR</button>
-            </div>
-        </div>
-    </div>
-    
-    <section id="nosotros">
-        <h2>NOSOTROS</h2>
-        <p>Pagina educativa para desarrollo motriz</p>
-    </section>
-    
-    <footer>
-        <p>© 2025 PEMSAM</p>
     </footer>
 
     <script src="script.js"></script>
+    
 </body>
 </html>
