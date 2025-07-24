@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<h<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -25,7 +26,6 @@
                 </ul>
             </nav>
         </div>
-        
         <div class="hero">
             <h1 class="logo">
                 <span style="color: #f89854;">P</span>
@@ -42,17 +42,15 @@
             </div>
         </div>
     </header>
-
     <!-- Sección Nosotros -->
     <section id="nosotros" class="nosotros-section">
         <h2>Nosotros</h2>
         <p>PEMSAM es una plataforma de juegos educativos diseñada para niños, combinando diversión con aprendizaje. Nuestros juegos están diseñados para desarrollar habilidades motoras, cognitivas y de coordinación mientras los niños se divierten.</p>
     </section>
-
+   
     <!-- Sección de Juegos -->
     <section id="juegos" class="games-section">
         <h2>Nuestros Juegos Educativos</h2>
-        
         <div class="games-grid">
             <!-- Juego 1: Carrera de Obstáculos -->
             <div class="game-card">
@@ -63,7 +61,6 @@
                 <p>Controla un personaje que debe esquivar obstáculos en un curso desafiante.</p>
                 <button class="play-game-btn" data-game="obstacle">Jugar</button>
             </div>
-            
             <!-- Juego 2: Puntería -->
             <div class="game-card">
                 <div class="game-icon" style="background-color: #f89854;">
@@ -73,7 +70,6 @@
                 <p>Apunta y haz clic en objetos en movimiento para ganar puntos.</p>
                 <button class="play-game-btn" data-game="aim">Jugar</button>
             </div>
-            
             <!-- Juego 3: Rompecabezas -->
             <div class="game-card">
                 <div class="game-icon" style="background-color: #3498db;">
@@ -83,7 +79,6 @@
                 <p>Arrastra y suelta piezas para completar la imagen correctamente.</p>
                 <button class="play-game-btn" data-game="puzzle">Jugar</button>
             </div>
-            
             <!-- Juego 4: Ascenso al Árbol -->
             <div class="game-card">
                 <div class="game-icon" style="background-color: #2f2152;">
@@ -93,7 +88,6 @@
                 <p>Presiona teclas para subir en un árbol evitando obstáculos.</p>
                 <button class="play-game-btn" data-game="tree">Jugar</button>
             </div>
-            
             <!-- Juego 5: Laberinto -->
             <div class="game-card">
                 <div class="game-icon" style="background-color: #f7e259;">
@@ -103,7 +97,6 @@
                 <p>Navega a través de un laberinto con el mouse para encontrar la salida.</p>
                 <button class="play-game-btn" data-game="maze">Jugar</button>
             </div>
-            
             <!-- Juego 6: Teclado Musical -->
             <div class="game-card">
                 <div class="game-icon" style="background-color: #f89854;">
@@ -113,7 +106,6 @@
                 <p>Presiona teclas específicas para producir sonidos musicales.</p>
                 <button class="play-game-btn" data-game="music">Jugar</button>
             </div>
-            
             <!-- Juego 7: Identificación de Animales -->
             <div class="game-card">
                 <div class="game-icon" style="background-color: #3498db;">
@@ -124,11 +116,113 @@
                 <button class="play-game-btn" data-game="animals">Jugar</button>
             </div>
         </div>
+       
+        <!-- Modales de Juegos -->
+        <!-- Modal Juego 1: Carrera de Obstáculos -->
+        <div id="obstacle-modal" class="game-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000;">
+            <div class="game-content" style="background:white; padding:20px; position:relative; max-width:800px; width:90%; border-radius: 10px;">
+                <button class="close-modal" style="position:absolute; top:10px; right:10px; font-size: 24px; cursor: pointer; background: none; border: none;">&times;</button>
+                <h2>Carrera de Obstáculos</h2>
+                <div id="obstacle-game" style="position:relative; height:300px; background:#eee; overflow:hidden; margin-top:20px; border: 1px solid #ccc;">
+                    <div id="obstacle-character" style="position:absolute; bottom:0; left:50px; width:30px; height:30px; background:red;"></div>
+                </div>
+                <p style="margin-top:10px;">Puntuación: <span id="obstacle-score">0</span> | Nivel: <span id="obstacle-level">1</span></p>
+                <p style="margin-top:10px;">Controles: Usa las teclas W (arriba) y S (abajo)</p>
+            </div>
+        </div>
+       
+        <!-- Modal Juego 2: Puntería -->
+        <div id="aim-modal" class="game-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000;">
+            <div class="game-content" style="background:white; padding:20px; position:relative; max-width:800px; width:90%; height: 80%; border-radius: 10px;">
+                <button class="close-modal" style="position:absolute; top:10px; right:10px; font-size: 24px; cursor: pointer; background: none; border: none;">&times;</button>
+                <h2>Puntería</h2>
+                <div id="aim-game" style="position:relative; height:90%; background:#eee; overflow:hidden; margin-top:20px; border: 1px solid #ccc;">
+                    <div id="aim-crosshair" style="display:none; width:20px; height:20px; border: 2px solid red; border-radius: 50%; position:absolute; pointer-events: none;"></div>
+                </div>
+                <p style="margin-top:10px;">Puntuación: <span id="aim-score">0</span> | Tiempo: <span id="aim-time">30</span>s</p>
+                <p style="margin-top:10px;">Instrucciones: Mueve el mouse para apuntar y haz clic en los objetivos</p>
+            </div>
+        </div>
+       
+        <!-- Modal Juego 3: Rompecabezas -->
+        <div id="puzzle-modal" class="game-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000;">
+            <div class="game-content" style="background:white; padding:20px; position:relative; max-width:800px; width:90%; height: 80%; border-radius: 10px;">
+                <button class="close-modal" style="position:absolute; top:10px; right:10px; font-size: 24px; cursor: pointer; background: none; border: none;">&times;</button>
+                <h2>Rompecabezas</h2>
+                <div id="puzzle-game" style="position:relative; height:90%; background:#eee; overflow:hidden; margin-top:20px; border: 1px solid #ccc;">
+                </div>
+                <p style="margin-top:10px;">Tiempo: <span id="puzzle-time">0</span>s | Piezas colocadas: <span id="puzzle-pieces">0</span>/16</p>
+                <p style="margin-top:10px;">Instrucciones: Arrastra las piezas a su posición correcta</p>
+            </div>
+        </div>
+       
+        <!-- Modal Juego 4: Ascenso al Árbol -->
+        <div id="tree-modal" class="game-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000;">
+            <div class="game-content" style="background:white; padding:20px; position:relative; max-width:800px; width:90%; height: 80%; border-radius: 10px;">
+                <button class="close-modal" style="position:absolute; top:10px; right:10px; font-size: 24px; cursor: pointer; background: none; border: none;">&times;</button>
+                <h2>Ascenso al Árbol</h2>
+                <div id="tree-climb-game" style="position:relative; height:90%; background:#eee; overflow:hidden; margin-top:20px; border: 1px solid #ccc;">
+                    <div id="tree" style="position:absolute; left:50%; top:0; width:20px; height:100%; background:#8B4513;"></div>
+                    <div id="climber" style="position:absolute; bottom:20px; left:50%; width:20px; height:20px; background:#333; border-radius: 50%;"></div>
+                </div>
+                <p style="margin-top:10px;">Puntuación: <span id="tree-score">0</span> | Altura: <span id="tree-height">0</span>m</p>
+                <p style="margin-top:10px;">Controles: Usa las teclas W (subir) y S (bajar)</p>
+            </div>
+        </div>
+       
+        <!-- Modal Juego 5: Laberinto -->
+        <div id="maze-modal" class="game-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000;">
+            <div class="game-content" style="background:white; padding:20px; position:relative; max-width:800px; width:90%; height: 80%; border-radius: 10px;">
+                <button class="close-modal" style="position:absolute; top:10px; right:10px; font-size: 24px; cursor: pointer; background: none; border: none;">&times;</button>
+                <h2>Laberinto</h2>
+                <div id="maze" style="position:relative; height:90%; background:#eee; overflow:hidden; margin-top:20px; border: 1px solid #ccc;">
+                    <div id="maze-player" style="position:absolute; width:20px; height:20px; background:#333; border-radius: 50%;"></div>
+                    <div id="maze-exit" style="position:absolute; width:30px; height:30px; background:green; border-radius: 5px;"></div>
+                    <div class="maze-options" style="display:none; position:absolute; top:50%; left:50%; transform: translate(-50%, -50%); background:white; padding:20px; border-radius: 10px; text-align:center;">
+                        <p>¡Has chocado con una pared!</p>
+                        <button id="maze-continue" style="margin: 10px; padding: 10px 20px; background:#3498db; color:white; border:none; border-radius: 5px; cursor:pointer;">Continuar</button>
+                        <button id="maze-giveup" style="margin: 10px; padding: 10px 20px; background:#e74c3c; color:white; border:none; border-radius: 5px; cursor:pointer;">Rendirse</button>
+                    </div>
+                </div>
+                <p style="margin-top:10px;">Intentos: <span id="maze-attempts">0</span> | Nivel: <span id="maze-level">1</span></p>
+                <p style="margin-top:10px;">Instrucciones: Mueve el mouse para guiar al jugador (círculo negro) hacia la salida (cuadro verde)</p>
+            </div>
+        </div>
+       
+        <!-- Modal Juego 6: Teclado Musical -->
+        <div id="music-modal" class="game-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000;">
+            <div class="game-content" style="background:white; padding:20px; position:relative; max-width:800px; width:90%; border-radius: 10px;">
+                <button class="close-modal" style="position:absolute; top:10px; right:10px; font-size: 24px; cursor: pointer; background: none; border: none;">&times;</button>
+                <h2>Teclado Musical</h2>
+                <div id="music-game" style="display:flex; justify-content:center; align-items:flex-end; height:200px; background:#eee; margin-top:20px; border: 1px solid #ccc; padding: 20px;">
+                </div>
+                <p style="margin-top:20px;">Melodía a reproducir: <span id="music-melody"></span></p>
+                <p style="margin-top:10px;">Notas correctas: <span id="music-correct">0</span></p>
+                <p style="margin-top:10px;">Instrucciones: Usa las teclas A, S, D, F, G, H, J para tocar las notas. Repite la melodía que se muestra arriba.</p>
+            </div>
+        </div>
+       
+        <!-- Modal Juego 7: Identificación de Animales -->
+        <div id="animals-modal" class="game-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000;">
+            <div class="game-content" style="background:white; padding:20px; position:relative; max-width:800px; width:90%; border-radius: 10px;">
+                <button class="close-modal" style="position:absolute; top:10px; right:10px; font-size: 24px; cursor: pointer; background: none; border: none;">&times;</button>
+                <h2>Identificación de Animales</h2>
+                <div id="animals-game" style="text-align:center; margin-top:20px;">
+                    <img id="animal-image" src="" alt="" style="max-width: 300px; max-height: 300px; border: 1px solid #ccc; border-radius: 10px;">
+                    <div style="margin: 20px 0;">
+                        <input type="text" id="animal-input" placeholder="Escribe el nombre del animal" style="padding: 10px; width: 200px; margin-right: 10px;">
+                        <button id="animal-submit" style="padding: 10px 20px; background:#3498db; color:white; border:none; border-radius: 5px; cursor:pointer;">Enviar</button>
+                    </div>
+                    <div id="animal-options" style="margin: 20px 0;"></div>
+                </div>
+                <p style="margin-top:10px;">Puntuación: <span id="animals-score">0</span> | Correctas: <span id="animals-correct">0</span>/10</p>
+            </div>
+        </div>
     </section>
-
+   
     <!-- Contenedor para los juegos -->
     <div id="game-container" class="game-container"></div>
-
+   
     <!-- Pie de página creativo -->
     <footer id="contacto" class="footer">
         <div class="footer-wave">
@@ -138,7 +232,6 @@
                 <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#2f2152"></path>
             </svg>
         </div>
-        
         <div class="footer-content">
             <div class="footer-column">
                 <h3>Explora</h3>
@@ -149,7 +242,6 @@
                     <li><a href="#contacto">Contacto</a></li>
                 </ul>
             </div>
-            
             <div class="footer-column">
                 <h3>Juegos</h3>
                 <ul>
@@ -159,7 +251,6 @@
                     <li><a href="#" data-game="tree">Ascenso al Árbol</a></li>
                 </ul>
             </div>
-            
             <div class="footer-column">
                 <h3>Contacto</h3>
                 <div class="contact-info">
@@ -168,13 +259,12 @@
                     <p><i class="fas fa-map-marker-alt"></i> Ciudad Educativa, Calle Aprendizaje 123</p>
                 </div>
             </div>
-            
             <div class="footer-column newsletter">
                 <h3>Newsletter</h3>
                 <p>Suscríbete para recibir novedades y nuevos juegos</p>
-                <form id="newsletter-form">
-                    <input type="email" placeholder="Tu correo electrónico" required>
-                    <button type="submit">Suscribirse</button>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Tu correo electrónico" required>
+                    <button type="submit" class="newsletter-button">Suscribirse</button>
                 </form>
                 <div class="social-links">
                     <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -184,7 +274,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="footer-bottom">
             <p>&copy; 2023 PEMSAM. Todos los derechos reservados.</p>
             <div class="footer-links">
@@ -194,8 +283,8 @@
             </div>
         </div>
     </footer>
-
     <script src="script.js"></script>
-    
 </body>
 </html>
+
+
