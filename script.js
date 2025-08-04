@@ -291,94 +291,97 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     /* Juego 3: Rompecabezas */
-    function initPuzzleGame() {
-        const puzzleContainer = document.getElementById('puzzle-game');
-        const timeElement = document.getElementById('puzzle-time');
-        const piecesElement = document.getElementById('puzzle-pieces');
-        let time = 0;
-        let correctPieces = 0;
-        const totalPieces = 16;
-        const pieceSize = 50;
-        const pieces = [];
-        // Crear piezas del rompecabezas
-        for (let i = 0; i < totalPieces; i++) {
-            const piece = document.createElement('div');
-            piece.className = 'puzzle-piece';
-            piece.textContent = i + 1;
-            piece.setAttribute('draggable', 'true');
-            piece.dataset.correctPosition = i;
-            // Posición aleatoria inicial
-            piece.style.left = `${Math.random() * (puzzleContainer.offsetWidth - pieceSize)}px`;
-            piece.style.top = `${Math.random() * (puzzleContainer.offsetHeight - pieceSize)}px`;
-            piece.style.position = 'absolute';
-            piece.style.width = `${pieceSize}px`;
-            piece.style.height = `${pieceSize}px`;
-            piece.style.border = '1px solid #333';
-            piece.style.backgroundColor = '#f0f0f0';
-            piece.style.display = 'flex';
-            piece.style.justifyContent = 'center';
-            piece.style.alignItems = 'center';
-            piece.style.cursor = 'move';
-            puzzleContainer.appendChild(piece);
-            pieces.push(piece);
-            // Eventos de arrastre
-            piece.addEventListener('dragstart', function(e) {
-                e.dataTransfer.setData('text/plain', this.dataset.correctPosition);
-                setTimeout(() => this.style.opacity = '0.5', 0);
-            });
-            piece.addEventListener('dragend', function() {
-                this.style.opacity = '1';
-            });
-        }
-        // Permitir soltar piezas
-        puzzleContainer.addEventListener('dragover', function(e) {
-            e.preventDefault();
-        });
-        puzzleContainer.addEventListener('drop', function(e) {
-            e.preventDefault();
-            const pieceIndex = e.dataTransfer.getData('text/plain');
-            const piece = pieces.find(p => p.dataset.correctPosition === pieceIndex);
-            if (piece) {
-                // Calcular la posición correcta basada en el índice
-                const col = pieceIndex % 4;
-                const row = Math.floor(pieceIndex / 4);
-                const correctLeft = col * pieceSize;
-                const correctTop = row * pieceSize;
-                // Obtener posición donde se soltó
-                const rect = puzzleContainer.getBoundingClientRect();
-                const dropX = e.clientX - rect.left - pieceSize / 2;
-                const dropY = e.clientY - rect.top - pieceSize / 2;
-                // Verificar si está cerca de la posición correcta
-                if (
-                    Math.abs(dropX - correctLeft) < 20 &&
-                    Math.abs(dropY - correctTop) < 20
-                ) {
-                    // Colocar en posición correcta
-                    piece.style.left = `${correctLeft}px`;
-                    piece.style.top = `${correctTop}px`;
-                    piece.style.backgroundColor = '#2f2152';
-                    piece.style.color = 'white';
-                    piece.setAttribute('draggable', 'false');
-                    correctPieces++;
-                    piecesElement.textContent = correctPieces;
-                    // Verificar si se completó
-                    if (correctPieces === totalPieces) {
-                        clearInterval(gameIntervals.puzzle);
-                        alert(`¡Rompecabezas completado en ${time} segundos!`);
-                    }
-                } else {
-                    // Mover a donde se soltó
-                    piece.style.left = `${dropX}px`;
-                    piece.style.top = `${dropY}px`;
-                }
-            }
-        });
-        // Temporizador
-        gameIntervals.puzzle = setInterval(function() {
-            time++;
-            timeElement.textContent = time;
-        }, 1000);
+   function initPuzzleGame() {
+  const timeElement = document.getElementById('puzzle-time');
+  const piecesElement = document.getElementById('puzzle-pieces');
+  const puzzleContainer = document.getElementById('puzzle-container');
+
+  const rows = 4;
+  const cols = 5;
+  const totalPieces = rows * cols;
+  const pieceWidth = puzzleContainer.offsetWidth / cols;
+  const pieceHeight = puzzleContainer.offsetHeight / rows;
+  const snapTolerance = 20;
+
+  let time = 0;
+  let correctPieces = 0;
+  const pieces = [];
+
+  const intervalId = setInterval(() => {
+    time++;
+    timeElement.textContent = time;
+  }, 1000);
+
+  for (let i = 0; i < totalPieces; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'puzzle-piece';
+    piece.setAttribute('draggable', 'true');
+    piece.dataset.correctPosition = i;
+
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+
+    // Posición de fondo para simular recorte
+    piece.style.backgroundPosition = `-${col * pieceWidth}px -${row * pieceHeight}px`;
+
+    // Posición aleatoria inicial
+    piece.style.left = `${Math.random() * (puzzleContainer.offsetWidth - pieceWidth)}px`;
+    piece.style.top = `${Math.random() * (puzzleContainer.offsetHeight - pieceHeight)}px`;
+
+    puzzleContainer.appendChild(piece);
+    pieces.push(piece);
+
+    // Eventos de arrastre
+    piece.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', piece.dataset.correctPosition);
+      setTimeout(() => piece.style.opacity = '0.5', 0);
+    });
+
+    piece.addEventListener('dragend', () => {
+      piece.style.opacity = '1';
+    });
+  }
+
+  puzzleContainer.addEventListener('dragover', (e) => e.preventDefault());
+
+  puzzleContainer.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const index = e.dataTransfer.getData('text/plain');
+    const piece = pieces.find(p => p.dataset.correctPosition === index);
+
+    if (!piece || piece.draggable === "false") return;
+
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    const correctLeft = col * pieceWidth;
+    const correctTop = row * pieceHeight;
+
+    const dropX = e.clientX - puzzleContainer.getBoundingClientRect().left - pieceWidth / 2;
+    const dropY = e.clientY - puzzleContainer.getBoundingClientRect().top - pieceHeight / 2;
+
+    if (
+      Math.abs(dropX - correctLeft) < snapTolerance &&
+      Math.abs(dropY - correctTop) < snapTolerance
+    ) {
+      piece.style.left = `${correctLeft}px`;
+      piece.style.top = `${correctTop}px`;
+      piece.setAttribute('draggable', 'false');
+      correctPieces++;
+      piecesElement.textContent = correctPieces;
+
+      if (correctPieces === totalPieces) {
+        clearInterval(intervalId);
+        alert(`¡Rompecabezas completado en ${time} segundos!`);
+      }
+    } else {
+      piece.style.left = `${dropX}px`;
+      piece.style.top = `${dropY}px`;
     }
+  });
+}
+
+initPuzzleGame();
+
     /* Juego 4: Ascenso al Árbol */
     function initTreeGame() {
         const gameContainer = document.getElementById('tree-climb-game');
