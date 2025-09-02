@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrera de Obstáculos - PEMSAM</title>
+  <style>
+    :root{
+      --azul:#03658C; --amarillo:#F2B705; --rojo:#F20505; --verde:#2ecc71;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif; background:#f7fbff; color:#024}
+    .wrap{max-width:900px; margin:0 auto; padding:16px}
+    .panel{background:#fff; border:2px solid var(--azul); border-radius:12px; padding:14px; box-shadow:0 10px 22px rgba(6,9,102,0.08)}
+    h1{margin:0 0 8px; font-size:1.25rem; color:var(--azul)}
+    .scoreboard{font-weight:700; color:#024; margin-bottom:8px}
+    .controls{display:flex; gap:8px; align-items:center; margin:8px 0}
+    .btn{background:var(--azul); color:#fff; border:0; padding:6px 10px; border-radius:10px; cursor:pointer; font-weight:700}
+    .btn:hover{background:var(--amarillo); color:var(--azul)}
+
+    .game{position:relative; width:480px; height:260px; margin:12px auto; border:2px solid var(--azul); border-radius:10px; overflow:hidden; background:#f7fbff}
+    .game.focus-hint{outline:2px dashed var(--amarillo)}
+    .character{position:absolute; bottom:10px; left:50px; width:30px; height:30px; background:#3498db; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,.15)}
+    .obstacle{position:absolute; width:30px; height:30px; background:#e74c3c; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,.18)}
+
+    .hint{font-size:.95rem; color:#024; margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Carrera de Obstáculos</h1>
+      <div class="scoreboard">Puntuación: <span id="score">0</span> | Nivel: <span id="level">1</span></div>
+      <div id="game" class="game" tabindex="0" aria-label="Juego Carrera de Obstáculos">
+        <div id="character" class="character" aria-label="Jugador"></div>
+      </div>
+      <div class="controls">
+        <button id="restart" class="btn">Reiniciar</button>
+        <span class="hint">Controles: W/S, A/D o Flechas para moverte horizontalmente. Haz clic en el área del juego si no responden las teclas.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const game = document.getElementById('game');
+      const character = document.getElementById('character');
+      const scoreEl = document.getElementById('score');
+      const levelEl = document.getElementById('level');
+      const restartBtn = document.getElementById('restart');
+
+      let score = 0, level = 1, speed = 5;
+      let charLeft = 50; // px desde el borde izquierdo
+      let running = false;
+      let spawnIntervalId = null, moveIntervalId = null;
+
+      function setChar(x){
+        const max = game.clientWidth - character.clientWidth - 10; // margen para no salir
+        charLeft = Math.max(0, Math.min(x, max));
+        character.style.left = charLeft + 'px';
+      }
+
+      function handleKey(e){
+        const k = e.key;
+        const step = 20;
+        if (k === 'a' || k === 'A' || k === 'ArrowLeft' || k === 's' || k === 'S') { // izquierda
+          setChar(charLeft - step);
+        }
+        if (k === 'd' || k === 'D' || k === 'ArrowRight' || k === 'w' || k === 'W') { // derecha
+          setChar(charLeft + step);
+        }
+      }
+
+      function createObstacle(){
+        const o = document.createElement('div');
+        o.className = 'obstacle';
+        o.style.right = '-30px';
+        const minBottom = 20;
+        const maxBottom = Math.max(minBottom, game.clientHeight - 60);
+        o.style.bottom = (Math.random() * (maxBottom - minBottom) + minBottom) + 'px';
+        game.appendChild(o);
+      }
+
+      function rect(el){ return el.getBoundingClientRect(); }
+
+      function tick(){
+        const obstacles = Array.from(game.querySelectorAll('.obstacle'));
+        const gRect = rect(game);
+        const cRect = rect(character);
+        for (const o of obstacles){
+          const currentRight = parseFloat(o.style.right) || 0;
+          const newRight = currentRight + speed;
+          o.style.right = newRight + 'px';
+          const oRect = rect(o);
+          // Colisión
+          if (
+            cRect.left < oRect.right &&
+            cRect.right > oRect.left &&
+            cRect.top < oRect.bottom &&
+            cRect.bottom > oRect.top
+          ){
+            gameOver();
+            return;
+          }
+          // Salió de pantalla por la izquierda (cuando su 'right' supera el ancho del contenedor)
+          if (newRight > gRect.width){
+            o.remove();
+            score += 10;
+            scoreEl.textContent = String(score);
+            if (score >= level * 100){
+              level++;
+              levelEl.textContent = String(level);
+              speed += 1.5; // aumentar dificultad
+            }
+          }
+        }
+      }
+
+      function start(){
+        stop();
+        // reset
+        score = 0; level = 1; speed = 5; setChar(50);
+        scoreEl.textContent = '0'; levelEl.textContent = '1';
+        // limpiar obstáculos existentes
+        Array.from(game.querySelectorAll('.obstacle')).forEach(o=>o.remove());
+        // listeners
+        game.addEventListener('keydown', handleKey);
+        window.addEventListener('keydown', handleKey);
+        // intervalos
+        spawnIntervalId = setInterval(createObstacle, 900);
+        moveIntervalId = setInterval(tick, 20);
+        running = true;
+        game.classList.remove('focus-hint');
+        // Enfocar para capturar teclas dentro del iframe inmediatamente
+        setTimeout(()=> game.focus(), 50);
+      }
+
+      function stop(){
+        running = false;
+        if (spawnIntervalId) { clearInterval(spawnIntervalId); spawnIntervalId = null; }
+        if (moveIntervalId) { clearInterval(moveIntervalId); moveIntervalId = null; }
+        game.removeEventListener('keydown', handleKey);
+        window.removeEventListener('keydown', handleKey);
+      }
+
+      function gameOver(){
+        stop();
+        alert('¡Chocaste! Puntuación: ' + score + '. Nivel alcanzado: ' + level);
+        game.classList.add('focus-hint');
+      }
+
+      restartBtn.addEventListener('click', start);
+      game.addEventListener('click', ()=> game.focus());
+      window.addEventListener('beforeunload', stop);
+
+      // iniciar al cargar
+      start();
+    })();
+  </script>
+</body>
+</html>

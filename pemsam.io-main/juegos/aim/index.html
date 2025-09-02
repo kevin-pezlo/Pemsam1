@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puntería - PEMSAM</title>
+  <style>
+    :root{ --azul:#03658C; --amarillo:#F2B705; --rojo:#F20505; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif; background:#f7fbff; color:#024}
+    .wrap{max-width:900px;margin:0 auto;padding:16px}
+    .panel{background:#fff;border:2px solid var(--azul);border-radius:12px;padding:14px;box-shadow:0 10px 22px rgba(6,9,102,0.08)}
+    h1{margin:0 0 8px;font-size:1.25rem;color:var(--azul)}
+    .scoreboard{font-weight:700;color:#024;margin-bottom:8px}
+    .controls{display:flex;gap:8px;align-items:center;margin:8px 0}
+    .btn{background:var(--azul);color:#fff;border:0;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:700}
+    .btn:hover{background:var(--amarillo);color:var(--azul)}
+
+    #game{position:relative;width:480px;height:300px;margin:12px auto;border:2px solid var(--azul);border-radius:10px;overflow:hidden;background:#fffbea;cursor:crosshair}
+    .target{position:absolute;border-radius:50%;background:#e74c3c;box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:crosshair}
+    #crosshair{width:20px;height:20px;border:2px solid var(--azul);border-radius:50%;position:absolute;pointer-events:none;display:none}
+    .msg{font-weight:700;color:#03658C;margin-top:6px;min-height:20px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Puntería</h1>
+      <div class="scoreboard">Puntuación: <span id="score">0</span> | Tiempo: <span id="time">30</span>s</div>
+      <div id="game" aria-label="Juego de puntería">
+        <div id="crosshair"></div>
+      </div>
+      <div class="controls">
+        <button id="restart" class="btn">Reiniciar</button>
+        <span>Haz clic en los objetivos antes de que se acabe el tiempo.</span>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const game = document.getElementById('game');
+      const crosshair = document.getElementById('crosshair');
+      const scoreEl = document.getElementById('score');
+      const timeEl = document.getElementById('time');
+      const msgEl = document.getElementById('msg');
+      const restartBtn = document.getElementById('restart');
+
+      let score = 0; let timeLeft = 30;
+      let spawnId = null, moveId = null, timerId = null;
+      let targets = [];
+      let running = false;
+
+      function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+      function setCrosshair(x, y){
+        const rect = game.getBoundingClientRect();
+        const cx = clamp(x - rect.left - 10, 0, game.clientWidth - 20);
+        const cy = clamp(y - rect.top - 10, 0, game.clientHeight - 20);
+        crosshair.style.left = cx + 'px';
+        crosshair.style.top = cy + 'px';
+      }
+
+      game.addEventListener('mousemove', (e)=>{
+        crosshair.style.display = 'block';
+        setCrosshair(e.clientX, e.clientY);
+      });
+      game.addEventListener('mouseleave', ()=>{ crosshair.style.display = 'none'; });
+
+      function createTarget(){
+        const t = document.createElement('div');
+        t.className = 'target';
+        const size = Math.random() * 20 + 20; // 20-40
+        const maxLeft = game.clientWidth - size;
+        const maxTop  = game.clientHeight - size;
+        t.style.width = size + 'px'; t.style.height = size + 'px';
+        t.style.left = (Math.random() * maxLeft) + 'px';
+        t.style.top  = (Math.random() * maxTop) + 'px';
+        game.appendChild(t);
+        targets.push(t);
+        t.addEventListener('click', function(ev){
+          ev.stopPropagation();
+          t.remove();
+          targets = targets.filter(x => x !== t);
+          score += 5;
+          scoreEl.textContent = String(score);
+        });
+      }
+
+      function moveTargets(){
+        targets.forEach(t => {
+          const size = parseFloat(t.style.width);
+          let l = parseFloat(t.style.left);
+          let tt = parseFloat(t.style.top);
+          const dx = (Math.random() - 0.5) * 5;
+          const dy = (Math.random() - 0.5) * 5;
+          l += dx; tt += dy;
+          if (l < 0) l = 0; if (l > game.clientWidth - size) l = game.clientWidth - size;
+          if (tt < 0) tt = 0; if (tt > game.clientHeight - size) tt = game.clientHeight - size;
+          t.style.left = l + 'px'; t.style.top = tt + 'px';
+        });
+      }
+
+      function stop(){
+        running = false;
+        if (spawnId) { clearInterval(spawnId); spawnId = null; }
+        if (moveId)  { clearInterval(moveId);  moveId  = null; }
+        if (timerId) { clearInterval(timerId); timerId = null; }
+      }
+
+      function reset(){
+        stop();
+        // limpiar
+        targets.forEach(t=>t.remove());
+        targets = [];
+        score = 0; timeLeft = 30; msgEl.textContent = '';
+        scoreEl.textContent = '0'; timeEl.textContent = '30';
+      }
+
+      function start(){
+        reset();
+        running = true;
+        spawnId = setInterval(createTarget, 1000);
+        moveId  = setInterval(moveTargets, 50);
+        timerId = setInterval(()=>{
+          timeLeft--; timeEl.textContent = String(timeLeft);
+          if (timeLeft <= 0){
+            stop();
+            msgEl.textContent = '¡Tiempo terminado! Puntuación final: ' + score;
+          }
+        }, 1000);
+      }
+
+      restartBtn.addEventListener('click', start);
+      window.addEventListener('beforeunload', stop);
+
+      // Inicio automático
+      start();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEMSAM</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="imagenes/LOGO-removebg-preview.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+    /* Animación para el header al hacer scroll */
+    #main-header.animated-scroll {
+        animation: headerMorph 0.7s cubic-bezier(.22,.61,.36,1);
+        background: var(--azul);
+        backdrop-filter: saturate(120%) blur(6px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+        transform: translateY(0) scale(1);
+    }
+    @keyframes headerMorph {
+        0% {
+            transform: translateY(-24px) scale(0.96);
+            opacity: 0;
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+        }
+        60% {
+            transform: translateY(0) scale(1.01);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Estilos mejorados para la sección Nosotros */
+    .about-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 28px;
+        align-items: center;
+    }
+    .about-left h2 {
+        font-size: 2.1rem;
+        color: var(--azul);
+        margin-bottom: 10px;
+    }
+    .about-left p.lead {
+        font-size: 1.08rem;
+        line-height: 1.6;
+        color: var(--negro);
+        margin-bottom: 14px;
+    }
+    .about-metrics {
+        display: flex;
+        gap: 18px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+    .metric {
+        background: linear-gradient(180deg, #fff, #f8fbff);
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 12px;
+        padding: 10px 14px;
+        min-width: 130px;
+        box-shadow: 0 6px 16px rgba(6,9,102,0.06);
+        text-align: center;
+    }
+    .metric-number {
+        display: block;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--azul);
+        letter-spacing: .5px;
+    }
+    .metric-label {
+        display: block;
+        font-size: .9rem;
+        color: var(--negro);
+    }
+    .about-right img {
+        width: 100%;
+        height: 100%;
+        max-height: 280px;
+        object-fit: cover;
+        border-radius: 14px;
+        box-shadow: 0 12px 34px rgba(0,0,0,0.15);
+        border: 3px solid var(--amarillo);
+    }
+    .about-cards {
+        max-width: 1100px;
+        margin: 16px auto 0 auto;
+        padding: 0 16px 12px 16px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+    .about-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 14px;
+        padding: 18px 14px;
+        text-align: left;
+        box-shadow: 0 10px 22px rgba(6,9,102,0.06);
+        transition: none;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(12px);
+    }
+        .about-card i {
+        font-size: 1.6rem;
+        color: var(--azul);
+        margin-bottom: 8px;
+    }
+    .about-cards .about-card:nth-child(1) i { color: var(--azul); }
+    .about-cards .about-card:nth-child(2) i { color: var(--amarillo); }
+    .about-cards .about-card:nth-child(3) i { color: var(--verde); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .about-card.is-visible { animation: fadeInUp .6s ease-out forwards; }
+    .about-card h3 {
+        font-size: 1.15rem;
+        color: var(--azul);
+        margin-bottom: 6px;
+    }
+    .about-card p {
+        font-size: .98rem;
+        color: var(--negro);
+        line-height: 1.5;
+    }
+    /* Fondo sutil para Nosotros */
+    #nosotros.nosotros-section {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        padding: 40px 10px 34px 10px;
+    }
+    @media (max-width: 900px) {
+        .about-container {
+            grid-template-columns: 1fr;
+        }
+        .about-right img {
+            max-height: 220px;
+        }
+        .about-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+    /* Mascota asistente */
+    .mascot { position: fixed; bottom: 20px; right: 20px; z-index: 4000; display: flex; align-items: flex-end; gap: 10px; }
+    .mascot-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--amarillo); color: var(--azul); display:flex; align-items:center; justify-content:center; font-size: 34px; box-shadow: 0 8px 18px rgba(0,0,0,0.18); border: 2px solid var(--azul); cursor: grab; user-select: none; }
+    .mascot-bubble { max-width: 280px; background: #fff; color: var(--azul); border: 2px solid var(--azul); border-radius: 12px; padding: 10px 12px; box-shadow: 0 10px 22px rgba(6,9,102,0.10); position: relative; }
+    .mascot-bubble:after { content: ''; position: absolute; right: -10px; bottom: 18px; border-width: 10px; border-style: solid; border-color: transparent transparent transparent var(--azul); }
+    .mascot-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .mascot-actions button { background: var(--azul); color: #fff; border: none; border-radius: 8px; padding: 6px 10px; font-size: 0.9rem; cursor: pointer; }
+    .mascot-actions button:hover { background: var(--amarillo); color: var(--azul); }
+    .mascot.minimized .mascot-bubble { display: none; }
+    .mascot.minimized .mascot-avatar { transform: scale(0.95); opacity: .95; cursor: pointer; }
+        </style>
+    <style>
+    /* Subrayado multicolor para menús (hover) */
+    #main-nav a, #dropdown-menu a, .footer .footer-content a { text-decoration: none; }
+    #main-nav a:hover, #dropdown-menu a:hover, .footer .footer-content a:hover {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 3px;
+      animation: underlineHue 6s linear infinite;
+    }
+    @keyframes underlineHue {
+      0% { text-decoration-color: var(--azul); }
+      33% { text-decoration-color: var(--amarillo); }
+      66% { text-decoration-color: var(--verde); }
+      100% { text-decoration-color: var(--azul); }
+    }
+    </style>
+</head>
+<body>
+    <header id="main-header">
+        <div class="brand-row">
+            <img src="imagenes/colsam_logo.png" alt="Escudo" class="escudo-fijo">
+            <div class="logo">PEMSAM</div>
+        </div>
+        <nav id="main-nav">
+            <a href="index.html">INICIO</a>
+            <a href="nosotros.html">NOSOTROS</a>
+            <a href="juegos.html">ACTIVIDADES</a>
+            <a href="contactanos.html">CONTACTANOS</a>
+            <a href="https://www.colsam.edu.co/" target="_blank">SAN ALBERTO MAGNO</a>
+        </nav>
+        <div class="hamburger" id="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <a href="index.html">INICIO</a>
+            <a href="nosotros.html">NOSOTROS</a>
+            <a href="juegos.html">ACTIVIDADES</a>
+            <a href="contactanos.html">CONTACTANOS</a>
+            <a href="https://www.colsam.edu.co/" target="_blank">SAN ALBERTO MAGNO</a>
+        </div>
+        <div id="menu-backdrop" class="menu-backdrop" aria-hidden="true"></div>
+    </header>
+<!-- slide -->
+    <section class="hero-slider" id="inicio">
+        <div class="hero-slider-bg" id="hero-slider-bg"></div>
+        <div class="hero-slider-content">
+            <h1>LA MEJOR PÁGINA DE</h1>
+            <p>JUEGOS EDUCATIVOS PARA UN<br>DESARROLLO MOTRIZ ÓPTIMO</p>
+            <a href="juegos.html" class="btn">JUGAR AHORA</a>
+        </div>
+                <div class="slider-dots" id="slider-dots"></div>
+    </section>
+    <!-- FIN slide -->
+    
+    <!-- Sección Nosotros -->
+    <section id="nosotros" class="nosotros-section">
+        <div class="about-container">
+            <div class="about-left">
+                <h2>Nosotros</h2>
+                <p class="lead">PEMSAM es una plataforma de juegos educativos diseñada para niños, combinando diversión con aprendizaje. Nuestros juegos desarrollan habilidades motoras, cognitivas y de coordinación en experiencias breves, seguras y motivantes.</p>
+                                            </div>
+                    </div>
+        <div class="about-cards">
+            <div class="about-card">
+                <i class="fas fa-bullseye"></i>
+                <h3>Misión</h3>
+                <p>Impulsar el aprendizaje a través del juego, fomentando la coordinación, la concentración y la creatividad en un entorno accesible y atractivo.</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Visión</h3>
+                <p>Convertirnos en referente en actividades educativas interactivas que conecten escuela y hogar, promoviendo hábitos saludables y curiosidad.</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-heart"></i>
+                <h3>Valores</h3>
+                <p>Trabajo colaborativo, respeto, inclusión y entusiasmo por aprender jugando, poniendo a los niños en el centro de cada decisión.</p>
+            </div>
+        </div>
+    </section>
+    
+    <div id="site-mascot" class="mascot" aria-live="polite">
+        <div class="mascot-bubble">
+            <div class="mascot-text">¡Hola! Soy SAM. ¿Quieres ir a las Actividades para jugar y aprender?</div>
+            <div class="mascot-actions">
+                <button id="mascot-go" aria-label="Ir a Actividades">Ir a Actividades</button>
+            </div>
+        </div>
+        <div class="mascot-avatar" title="Asistente SAM">🤖</div>
+    </div>
+
+    <footer id="contacto" class="footer">
+        <div class="footer-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="var(--azul)"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="var(--azul)"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="var(--azul)"></path>
+            </svg>
+        </div>
+        
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Explora</h3>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="juegos.html">Actividades</a></li>
+                    <li><a href="#contacto">Contactanos</a></li>
+                    <li><a href="https://www.colsam.edu.co/" target="_blank" rel="noopener noreferrer">San Alberto Magno</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Actividades</h3>
+                <ul>
+                    <li><a href="juegos.html#obstacle" data-game="obstacle">Carrera de Obstáculos</a></li>
+                    <li><a href="juegos.html#aim" data-game="aim">Puntería</a></li>
+                    <li><a href="juegos.html#puzzle" data-game="puzzle">Rompecabezas</a></li>
+                    <li><a href="juegos.html#tree" data-game="tree">Ascenso al Árbol</a></li>
+                    <li><a href="juegos.html#maze" data-game="maze">Laberinto</a></li>
+                    <li><a href="juegos.html#music" data-game="music">Teclado Musical</a></li>
+                    <li><a href="juegos.html#animals" data-game="animals">Identificación de Animales</a></li>
+                    <li><a href="juegos.html#buscamina" data-game="buscamina">Busca Minas</a></li>
+                                                                            </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contacto</h3>
+                <div class="contact-info">
+                    <p><i class="fas fa-envelope"></i> pemsam@mail.colsam.edu.co</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Colegio San Alberto Magno Cra. 3c #9171, Barranquilla, Atlántico</p>
+                </div>
+            </div>
+            
+            <div class="footer-column newsletter">
+                <div class="social-links">
+                    <a href="https://www.facebook.com/colegiosanalbertomagnobarranquilla/" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/colsambarranquilla/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 PEMSAM. Todos los derechos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Política de privacidad</a>
+                <a href="tyc.html">Términos y Condiciones</a>
+                <a href="#">Cookies</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Banner de Cookies Didáctico -->
+    <style>
+      .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5000; background: #fff; border-top: 2px solid var(--azul); box-shadow: 0 -8px 24px rgba(0,0,0,0.12); padding: 12px 16px; }
+      .cookie-content { max-width: 1100px; margin: 0 auto; display: flex; gap: 14px; align-items: flex-start; justify-content: space-between; }
+      .cookie-text { color: var(--azul); font-size: 0.98rem; }
+      .cookie-text strong { display: block; font-size: 1.05rem; margin-bottom: 4px; }
+      .cookie-link { background: transparent; border: none; color: var(--azul); text-decoration: underline; cursor: pointer; padding: 0; font-size: 0.95rem; }
+      .cookie-learn { margin-top: 8px; background: #f7fbff; border: 1px dashed var(--azul); border-radius: 8px; padding: 8px 10px; }
+      .cookie-learn ul { margin-left: 18px; }
+      .cookie-actions { display: flex; gap: 8px; flex-shrink: 0; }
+      .cookie-btn { border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 2px solid var(--azul); font-weight: 600; }
+      .cookie-btn.primary { background: var(--azul); color: #fff; }
+      .cookie-btn.secondary { background: #fff; color: var(--azul); }
+      @media (max-width: 700px) { .cookie-content { flex-direction: column; } .cookie-actions { align-self: flex-end; } }
+      /* Evitar solape con la mascota */
+      .with-banner .mascot { bottom: 90px; }
+    </style>
+    <div id="cookie-banner" class="cookie-banner" role="region" aria-label="Aviso de cookies">
+      <div class="cookie-content">
+        <div class="cookie-text">
+          <strong>Aviso de uso de cookies</strong>
+          <p>Utilizamos cookies para garantizar el correcto funcionamiento del sitio, analizar su uso y recordar sus preferencias. Puede aceptar o rechazar su utilización.</p>
+          <button id="cookie-learn-toggle" class="cookie-link" aria-expanded="false">Saber más</button>
+          <div id="cookie-learn" class="cookie-learn" hidden>
+            <ul>
+              <li><b>Esenciales</b>: necesarias para el funcionamiento del sitio web.</li>
+              <li><b>Analíticas</b>: nos ayudan a comprender y mejorar el uso del sitio.</li>
+              <li><b>Preferencias</b>: recuerdan sus opciones (por ejemplo, su última actividad).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="cookie-actions">
+          <button id="cookie-reject" class="cookie-btn secondary">Rechazar</button>
+          <button id="cookie-accept" class="cookie-btn primary">Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // Sticky header, hide nav, show hamburger + animación scroll
+    const header = document.getElementById('main-header');
+    const nav = document.getElementById('main-nav');
+    const hamburger = document.getElementById('hamburger-menu');
+    const dropdown = document.getElementById('dropdown-menu');
+
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    
+    function handleHeaderScroll() {
+        if(window.scrollY > 50) {
+            header.classList.add('sticky');
+            header.classList.add('animated-scroll');
+            nav.classList.add('hide');
+            hamburger.classList.add('show');
+        } else {
+            header.classList.remove('sticky');
+            header.classList.remove('animated-scroll');
+            nav.classList.remove('hide');
+            hamburger.classList.remove('show');
+            // Asegurar cierre del menú y reset del icono
+            dropdown.classList.remove('show');
+            hamburger.classList.remove('active');
+            const bd = document.getElementById('menu-backdrop');
+            if (bd) bd.classList.remove('show');
+        }
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                handleHeaderScroll();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    const backdrop = document.getElementById('menu-backdrop');
+    function openMenu(){ dropdown.classList.add('show'); hamburger.classList.add('active'); backdrop.classList.add('show'); }
+    function closeMenu(){ dropdown.classList.remove('show'); hamburger.classList.remove('active'); backdrop.classList.remove('show'); }
+
+    hamburger.addEventListener('click', () => {
+        if (dropdown.classList.contains('show')) { closeMenu(); } else { openMenu(); }
+    });
+    document.querySelectorAll('#dropdown-menu a').forEach(a=>{
+        a.addEventListener('click', ()=> closeMenu());
+    });
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+    window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMenu(); });
+
+    // SLIDER DE FONDO HERO
+    const heroImages = [
+        "imagenes/1.jpg",
+        "imagenes/2.jpg",
+        "imagenes/3.jpg",
+        "imagenes/4.jpg"
+    ];
+    let heroCurrent = 0;
+    const heroBg = document.getElementById('hero-slider-bg');
+    const heroDots = document.getElementById('slider-dots');
+            let heroInterval;
+
+    function setHeroBg(index) {
+        heroBg.style.backgroundImage = `url('${heroImages[index]}')`;
+        updateHeroDots(index);
+        heroCurrent = index;
+    }
+
+    function nextHero() {
+        let next = (heroCurrent + 1) % heroImages.length;
+        setHeroBg(next);
+    }
+
+    function prevHero() {
+        let prev = (heroCurrent - 1 + heroImages.length) % heroImages.length;
+        setHeroBg(prev);
+    }
+
+    function createHeroDots() {
+        heroDots.innerHTML = '';
+        heroImages.forEach((_, i) => {
+            const dot = document.createElement('span');
+            dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => {
+                setHeroBg(i);
+                resetHeroInterval();
+            });
+            heroDots.appendChild(dot);
+        });
+    }
+
+    function updateHeroDots(index) {
+        const dots = heroDots.querySelectorAll('.slider-dot');
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+    }
+
+    function startHeroInterval() {
+        heroInterval = setInterval(nextHero, 4000);
+    }
+
+    function resetHeroInterval() {
+        clearInterval(heroInterval);
+        startHeroInterval();
+    }
+
+    
+    
+    // Inicialización
+    createHeroDots();
+    setHeroBg(0);
+    startHeroInterval();
+
+    // Aparición tarjetas (revelar Misión, Visión y Valores)
+    (function(){
+      const cards = document.querySelectorAll('.about-cards .about-card');
+      if (!cards.length) return;
+      const obs = new IntersectionObserver((entries, observer) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.25 });
+      cards.forEach(c => obs.observe(c));
+    })();
+
+    // Cookie banner logic
+    (function(){
+      const banner = document.getElementById('cookie-banner');
+      if (!banner) return;
+      const accept = document.getElementById('cookie-accept');
+      const reject = document.getElementById('cookie-reject');
+      const toggle = document.getElementById('cookie-learn-toggle');
+      const learn = document.getElementById('cookie-learn');
+      function hide(){ banner.style.display = 'none'; document.body.classList.remove('with-banner'); }
+      function show(){ banner.style.display = 'block'; document.body.classList.add('with-banner'); }
+      const status = localStorage.getItem('cookieConsent');
+      if (status === 'accepted' || status === 'rejected') { hide(); } else { show(); }
+      if (accept) accept.addEventListener('click', ()=>{ localStorage.setItem('cookieConsent','accepted'); hide(); });
+      if (reject) reject.addEventListener('click', ()=>{ localStorage.setItem('cookieConsent','rejected'); hide(); });
+      if (toggle) toggle.addEventListener('click', ()=>{
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (learn) { learn.hidden = expanded; }
+      });
+    })();
+
+    // Mascota asistente (Inicio)
+    (function(){
+      const mascot = document.getElementById('site-mascot');
+      if (!mascot) return;
+      const goBtn = document.getElementById('mascot-go');
+      const avatar = mascot.querySelector('.mascot-avatar');
+      if (goBtn) goBtn.addEventListener('click', ()=> { window.location.href = 'juegos.html'; });
+      avatar.addEventListener('click', ()=> { if (mascot.classList.contains('minimized')) mascot.classList.remove('minimized'); });
+      // Arrastrar
+      let dragging=false, startX=0,startY=0,startRight=0,startBottom=0;
+      avatar.addEventListener('mousedown', (e)=> { dragging=true; mascot.style.transition='none'; startX=e.clientX; startY=e.clientY; const rect=mascot.getBoundingClientRect(); startRight = window.innerWidth - rect.right; startBottom = window.innerHeight - rect.bottom; document.body.style.userSelect='none'; });
+      window.addEventListener('mousemove', (e)=> { if (!dragging) return; const dx = e.clientX - startX; const dy = e.clientY - startY; mascot.style.right = Math.max(8, startRight - dx) + 'px'; mascot.style.bottom = Math.max(8, startBottom - dy) + 'px'; });
+      window.addEventListener('mouseup', ()=> { if (!dragging) return; dragging=false; mascot.style.transition=''; document.body.style.userSelect=''; });
+    })();
+    </script>
+</body>
+</html>
