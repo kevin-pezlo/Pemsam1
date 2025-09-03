@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Identificación de Animales - PEMSAM</title>
+  <style>
+    :root{ --azul:#03658C; --amarillo:#F2B705; --rojo:#F20505; --verde:#2ecc71; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif; background:#f7fbff; color:#024}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .panel{background:#fff;border:2px solid var(--azul);border-radius:12px;padding:14px;box-shadow:0 10px 22px rgba(6,9,102,0.08)}
+    h1{margin:0 0 8px;font-size:1.25rem;color:var(--azul)}
+    .scoreboard{font-weight:700;color:#024;margin-bottom:8px}
+    .controls{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}
+    .btn{background:var(--azul);color:#fff;border:0;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+    .btn:hover{background:var(--amarillo);color:var(--azul)}
+
+    #animal-image{width:300px;height:200px;object-fit:cover;margin:10px auto;display:block;border-radius:10px;border:2px solid var(--azul)}
+    #animal-options{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}
+    .option{margin:0;padding:10px 15px;background:#3498db;color:#fff;border:0;border-radius:8px;cursor:pointer;font-weight:700}
+    .option:hover{background:#2d7fb8}
+    .inline-input{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:6px}
+    .inline-input input{padding:8px;border:1px solid #aac;border-radius:8px;width:60%}
+    .msg{font-weight:700;margin-top:8px;min-height:20px}
+    .msg.ok{color:var(--verde)}
+    .msg.err{color:var(--rojo)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Identificación de Animales</h1>
+      <div class="scoreboard">Puntos: <span id="score">0</span> | Aciertos: <span id="correct">0</span>/10</div>
+      <img id="animal-image" src="" alt="Animal" />
+      <div id="animal-options"></div>
+      <div class="inline-input">
+        <input id="animal-input" type="text" placeholder="Escribe el nombre del animal" />
+        <button id="submit" class="btn">Responder</button>
+        <button id="next" class="btn" title="Saltar y ver otro animal">Siguiente</button>
+      </div>
+      <div id="msg" class="msg" aria-live="polite"></div>
+      <div class="controls">
+        <button id="restart" class="btn">Reiniciar</button>
+        <span>Selecciona una opción o escribe el nombre del animal y pulsa Responder.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const imgEl = document.getElementById('animal-image');
+      const optionsEl = document.getElementById('animal-options');
+      const inputEl = document.getElementById('animal-input');
+      const submitBtn = document.getElementById('submit');
+      const nextBtn = document.getElementById('next');
+      const scoreEl = document.getElementById('score');
+      const correctEl = document.getElementById('correct');
+      const msgEl = document.getElementById('msg');
+      const restartBtn = document.getElementById('restart');
+
+      const animals = [
+        { name: 'perro', image: 'https://cdn.pixabay.com/photo/2016/12/13/05/15/puppy-1903313_640.jpg' },
+        { name: 'gato', image: 'https://cdn.pixabay.com/photo/2017/02/20/18/03/cat-2083492_640.jpg' },
+        { name: 'elefante', image: 'https://cdn.pixabay.com/photo/2016/11/14/04/45/elephant-1822636_640.jpg' },
+        { name: 'leon', image: 'https://cdn.pixabay.com/photo/2017/10/25/16/54/african-lion-2888519_640.jpg' },
+        { name: 'tigre', image: 'https://cdn.pixabay.com/photo/2017/07/24/19/57/tiger-2535888_640.jpg' },
+        { name: 'jirafa', image: 'https://cdn.pixabay.com/photo/2017/04/11/21/34/giraffe-2222908_640.jpg' },
+        { name: 'cebra', image: 'https://cdn.pixabay.com/photo/2017/01/14/12/59/zebra-1979305_640.jpg' },
+        { name: 'mono', image: 'https://cdn.pixabay.com/photo/2016/03/27/19/31/baboon-1284570_640.jpg' },
+        { name: 'oso', image: 'https://cdn.pixabay.com/photo/2017/07/18/18/24/bear-2516599_640.jpg' },
+        { name: 'pinguino', image: 'https://cdn.pixabay.com/photo/2016/11/22/21/36/animal-1850455_640.jpg' }
+      ];
+
+      let score = 0, correct = 0, current = null, used = new Set();
+      const WIN_TARGET = 10;
+
+      function shuffle(a){ for (let i=a.length-1; i>0; i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+      function pickNew(){
+        inputEl.value = ''; msgEl.textContent = ''; msgEl.className = 'msg';
+        // evitar repetir hasta usar todos
+        if (used.size >= animals.length) used.clear();
+        let next;
+        do { next = animals[Math.floor(Math.random()*animals.length)]; } while (used.has(next.name) && used.size < animals.length);
+        used.add(next.name);
+        current = next;
+        imgEl.src = current.image; imgEl.alt = current.name;
+
+        // opciones
+        optionsEl.innerHTML = '';
+        const pool = animals.filter(a => a.name !== current.name);
+        shuffle(pool);
+        const incorrect = pool.slice(0,3).map(a => a.name);
+        const opts = shuffle([current.name, ...incorrect]);
+        opts.forEach(opt => {
+          const b = document.createElement('button');
+          b.className = 'option'; b.textContent = opt;
+          b.addEventListener('click', ()=> check(opt));
+          optionsEl.appendChild(b);
+        });
+      }
+
+      function setMsg(text, ok){
+        msgEl.textContent = text || '';
+        msgEl.className = 'msg ' + (ok ? 'ok' : 'err');
+      }
+
+      function win(){
+        alert('¡Felicidades! Has identificado ' + WIN_TARGET + ' animales. Puntuación final: ' + score);
+        restart();
+      }
+
+      function updateScore(){ scoreEl.textContent = String(score); correctEl.textContent = String(correct); }
+
+      function check(answer){
+        if (!current) return;
+        const a = String(answer || '').trim().toLowerCase();
+        if (!a) return;
+        if (a === current.name){
+          score += 10; correct += 1; updateScore();
+          setMsg('¡Correcto! Era ' + current.name + '.', true);
+          if (correct >= WIN_TARGET) { win(); return; }
+          setTimeout(pickNew, 500);
+        } else {
+          setMsg('Incorrecto. Era ' + current.name + '. Intenta con el siguiente.', false);
+          setTimeout(pickNew, 700);
+        }
+      }
+
+      submitBtn.addEventListener('click', ()=> check(inputEl.value));
+      inputEl.addEventListener('keypress', (e)=>{ if (e.key === 'Enter') check(inputEl.value); });
+      nextBtn.addEventListener('click', pickNew);
+
+      function restart(){
+        score = 0; correct = 0; used.clear(); updateScore(); pickNew();
+      }
+      restartBtn.addEventListener('click', restart);
+
+      // init
+      restart();
+    })();
+  </script>
+</body>
+</html>

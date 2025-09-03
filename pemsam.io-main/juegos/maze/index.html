@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Laberinto - PEMSAM</title>
+  <style>
+    :root{ --azul:#03658C; --amarillo:#F2B705; --rojo:#F20505; --verde:#2ecc71; --panel:#fff; --borde:#024e73 }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif;background:#f3f8fc;color:#123}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .panel{background:var(--panel);border:3px solid var(--azul);border-radius:16px;box-shadow:0 16px 36px rgba(0,0,0,.12);padding:16px}
+    h1{margin:0 0 8px 0;color:var(--azul)}
+    p{margin:0 0 8px 0;color:#345}
+    .score{font-weight:800;color:#024e73;margin:8px 0}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+    .btn{border:2px solid var(--azul);background:var(--azul);color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .btn:hover{background:var(--amarillo);color:var(--azul)}
+    .canvas-wrap{display:flex;justify-content:center;align-items:center;margin:12px 0}
+    canvas{background:#fff;border:2px solid var(--borde);border-radius:10px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+    .msg{min-height:20px;font-weight:700}
+    .ok{color:var(--verde)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Laberinto</h1>
+      <p>Usa Flechas o WASD para moverte hasta la salida. Cada nivel genera un laberinto nuevo.</p>
+      <div class="score">Nivel: <span id="level">1</span> | Pasos: <span id="steps">0</span></div>
+      <div class="canvas-wrap"><canvas id="maze" width="672" height="480" aria-label="Área de juego: Laberinto"></canvas></div>
+      <div id="message" class="msg" aria-live="polite"></div>
+      <div class="controls">
+        <button id="new" class="btn">Nuevo laberinto</button>
+        <button id="restart" class="btn">Reiniciar nivel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const canvas = document.getElementById('maze');
+    const ctx = canvas.getContext('2d');
+    const levelEl = document.getElementById('level');
+    const stepsEl = document.getElementById('steps');
+    const msgEl = document.getElementById('message');
+    const btnNew = document.getElementById('new');
+    const btnRestart = document.getElementById('restart');
+
+    let rows = 15, cols = 21; // base
+    let cellSize = 32;        // ajustado por tamaño canvas
+    let grid, player, exit, steps = 0, level = 1;
+
+    function resizeToFit(){
+      // Mantener canvas dentro de 92vw/70vh aprox
+      const maxW = Math.min(900, Math.floor(window.innerWidth * 0.92));
+      const maxH = Math.min(700, Math.floor(window.innerHeight * 0.70));
+      const desiredW = cols * cellSize;
+      const desiredH = rows * cellSize;
+      let scale = Math.min(maxW/desiredW, maxH/desiredH, 1);
+      canvas.width = Math.floor(desiredW * scale);
+      canvas.height = Math.floor(desiredH * scale);
+    }
+
+    function Cell(r, c){
+      this.r = r; this.c = c; this.visited = false;
+      this.walls = { top:true, right:true, bottom:true, left:true };
+    }
+
+    function initGrid(){
+      grid = new Array(rows);
+      for(let r=0;r<rows;r++){ grid[r] = new Array(cols); for(let c=0;c<cols;c++){ grid[r][c] = new Cell(r,c); } }
+    }
+
+    function neighbors(cell){
+      const dirs = [];
+      if (cell.r > 0) dirs.push(grid[cell.r-1][cell.c]);
+      if (cell.c < cols-1) dirs.push(grid[cell.r][cell.c+1]);
+      if (cell.r < rows-1) dirs.push(grid[cell.r+1][cell.c]);
+      if (cell.c > 0) dirs.push(grid[cell.r][cell.c-1]);
+      return dirs.filter(n => !n.visited);
+    }
+
+    function removeWalls(a, b){
+      if (a.r === b.r){
+        if (a.c < b.c){ a.walls.right = false; b.walls.left = false; }
+        else { a.walls.left = false; b.walls.right = false; }
+      } else if (a.c === b.c){
+        if (a.r < b.r){ a.walls.bottom = false; b.walls.top = false; }
+        else { a.walls.top = false; b.walls.bottom = false; }
+      }
+    }
+
+    function generateMaze(){
+      initGrid();
+      const stack = [];
+      let current = grid[0][0];
+      current.visited = true;
+      stack.push(current);
+      while(stack.length){
+        const cur = stack[stack.length-1];
+        const nbs = neighbors(cur);
+        if (nbs.length){
+          const next = nbs[Math.floor(Math.random()*nbs.length)];
+          next.visited = true;
+          removeWalls(cur, next);
+          stack.push(next);
+        } else {
+          stack.pop();
+        }
+      }
+      // Definir salida en esquina opuesta
+      exit = { r: rows-1, c: cols-1 };
+      // Asegurar apertura hacia fuera
+      grid[exit.r][exit.c].walls.right = false;
+      grid[exit.r][exit.c].walls.bottom = false;
+    }
+
+    function draw(){
+      // Calcular cellSize real en función del canvas
+      const w = canvas.width, h = canvas.height;
+      const csW = Math.floor(w / cols), csH = Math.floor(h / rows);
+      const cs = Math.min(csW, csH);
+      // centrar dibujo si sobra
+      const offX = Math.floor((w - cs*cols)/2);
+      const offY = Math.floor((h - cs*rows)/2);
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(offX, offY, cs*cols, cs*rows);
+      ctx.strokeStyle = '#024e73';
+      ctx.lineWidth = Math.max(2, Math.floor(cs*0.08));
+      ctx.lineCap = 'square';
+      // Dibujar paredes
+      for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+          const x = offX + c*cs;
+          const y = offY + r*cs;
+          const cell = grid[r][c];
+          if (cell.walls.top){ ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x+cs, y); ctx.stroke(); }
+          if (cell.walls.right){ ctx.beginPath(); ctx.moveTo(x+cs, y); ctx.lineTo(x+cs, y+cs); ctx.stroke(); }
+          if (cell.walls.bottom){ ctx.beginPath(); ctx.moveTo(x, y+cs); ctx.lineTo(x+cs, y+cs); ctx.stroke(); }
+          if (cell.walls.left){ ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y+cs); ctx.stroke(); }
+        }
+      }
+      // Salida
+      ctx.fillStyle = '#F2B705';
+      ctx.fillRect(offX + exit.c*cs + cs*0.35, offY + exit.r*cs + cs*0.35, cs*0.3, cs*0.3);
+      // Jugador
+      ctx.fillStyle = '#03658C';
+      const px = offX + player.c*cs + cs*0.2;
+      const py = offY + player.r*cs + cs*0.2;
+      const pr = cs*0.6;
+      ctx.beginPath(); ctx.arc(px+pr/2, py+pr/2, pr/2, 0, Math.PI*2); ctx.fill();
+    }
+
+    function canMove(dr, dc){
+      const r = player.r, c = player.c;
+      const cur = grid[r][c];
+      if (dr === -1 && !cur.walls.top) return true;
+      if (dr === 1 && !cur.walls.bottom) return true;
+      if (dc === -1 && !cur.walls.left) return true;
+      if (dc === 1 && !cur.walls.right) return true;
+      return false;
+    }
+
+    function move(dr, dc){
+      if (!canMove(dr, dc)) return;
+      player.r += dr; player.c += dc; steps++; stepsEl.textContent = steps;
+      draw();
+      if (player.r === exit.r && player.c === exit.c){
+        msgEl.textContent = '¡Nivel superado! Generando siguiente...';
+        msgEl.className = 'msg ok';
+        setTimeout(nextLevel, 900);
+      } else {
+        msgEl.textContent = '';
+        msgEl.className = 'msg';
+      }
+    }
+
+    function keyHandler(e){
+      const k = e.key.toLowerCase();
+      if (k === 'arrowup' || k === 'w') { e.preventDefault(); move(-1, 0); }
+      else if (k === 'arrowdown' || k === 's') { e.preventDefault(); move(1, 0); }
+      else if (k === 'arrowleft' || k === 'a') { e.preventDefault(); move(0, -1); }
+      else if (k === 'arrowright' || k === 'd') { e.preventDefault(); move(0, 1); }
+    }
+
+    function restart(){
+      steps = 0; stepsEl.textContent = steps; msgEl.textContent = ''; msgEl.className = 'msg';
+      player = { r:0, c:0 };
+      draw();
+    }
+
+    function build(){
+      generateMaze();
+      player = { r:0, c:0 };
+      steps = 0; stepsEl.textContent = steps; msgEl.textContent = ''; msgEl.className = 'msg';
+      resizeToFit();
+      draw();
+    }
+
+    function nextLevel(){
+      level++;
+      levelEl.textContent = level;
+      // Aumentar tamaño alternando filas/columnas, con tope
+      if (level % 2 === 1) { cols = Math.min(cols + 2, 31); }
+      else { rows = Math.min(rows + 2, 21); }
+      build();
+    }
+
+    btnNew.addEventListener('click', ()=>{ build(); });
+    btnRestart.addEventListener('click', restart);
+    document.addEventListener('keydown', keyHandler);
+    window.addEventListener('resize', ()=>{ resizeToFit(); draw(); });
+
+    // Init
+    build();
+  })();
+  </script>
+</body>
+</html>
