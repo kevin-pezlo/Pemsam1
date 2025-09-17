@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Laberinto Mágico: ¡Ayuda al Conejo!</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ffd6e0 0%, #a5e7f0 100%);
+      font-family: 'Comic Sans MS', 'Baloo 2', cursive, sans-serif;
+      margin: 0; text-align: center;
+    }
+    h1 {
+      font-size: 2.8rem; color: #ff1493; margin: 24px 0 6px;
+      font-weight: 900; text-shadow: 2px 7px 18px #fff4, 1px 1px #fcee92;
+      letter-spacing: 1.5px;
+    }
+    #laberintoHeader {
+      font-size: 1.45rem; color: #1166ee; margin: 7px 0 22px 0;
+      font-weight: 700; letter-spacing: 2px; min-height: 28px;
+    }
+    #contenedorLab {
+      width: 100%; margin: 0 auto; position: relative; padding-top: 0.5vh;
+      box-sizing: border-box;
+    }
+    #laberinto {
+      margin: 0 auto; position: relative; 
+      width: 90vw; height: 55vh;
+      max-width: 1000px; max-height: 400px; 
+      min-width: 300px; min-height: 200px;
+      aspect-ratio: 2.6/1;
+      background: #fffbe8; border: 10px solid #ffb703; border-radius: 35px;
+      box-shadow: 0 5px 23px #ffa07a55; overflow: hidden;
+      user-select: none; box-sizing: border-box;
+    }
+    #conejo {
+      position: absolute; width: 4%; height: auto; aspect-ratio: 1/1; z-index: 15;
+      user-select: none; display: none; pointer-events: none;
+      filter: drop-shadow(0 0 8px #fff6f8) drop-shadow(0 0 16px #00cfff)
+              drop-shadow(0 0 24px #eaeaff) drop-shadow(0 0 36px #ff82e7);
+      animation: glowBunny 1s infinite alternate; transition: filter .15s;
+    }
+    @keyframes glowBunny {
+      0% { filter: drop-shadow(0 0 8px #fff6f8) drop-shadow(0 0 16px #00cfff)
+                   drop-shadow(0 0 24px #eaeaff) drop-shadow(0 0 30px #ff82e7);}
+      100% { filter: drop-shadow(0 0 18px #fff6f8) drop-shadow(0 0 34px #00d8ff)
+                     drop-shadow(0 0 38px #eaeaff) drop-shadow(0 0 48px #ffb8f733);}
+    }
+    #zanahoria {
+      position: absolute; width: 0.2%; height: 0.2%; right: 5.3%; bottom: 15.4%; z-index: 12;
+      pointer-events: auto;
+    }
+    #zanahoria::before {
+      content: ''; position: absolute; top: -3vh; left: -3vh;
+      width: 6vh; height: 6vh;
+      background-image: url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f955.png");
+      background-size: contain; background-repeat: no-repeat;
+      filter: drop-shadow(0 0 0 #ffb703) drop-shadow(0 0 16px #ffe784bb) drop-shadow(0 0 34px #ffb703ea);
+      animation: pulsoZanahoria 1.4s infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes pulsoZanahoria {
+      0% { filter: drop-shadow(0 0 24px #fffcccaa) drop-shadow(0 0 14px #ffe784cc) drop-shadow(0 0 31px #ffb703f2);}
+      100% { filter: drop-shadow(0 0 38px #fffccca3) drop-shadow(0 0 22px #fffbe3) drop-shadow(0 0 40px #ffd61fd4);}
+    }
+    .pared {
+      position: absolute; z-index: 10; pointer-events: auto;
+    }
+    .pared-h { height: 2px; }
+    .pared-v { width: 2px; }
+    .pared::before {
+      content: ''; position: absolute; top: -9px; left: -9px;
+      width: calc(100% + 18px); height: calc(100% + 18px);
+      background: linear-gradient(90deg, #ff69b4 80%, #fcdb55 100%);
+      border-radius: 9px;
+      box-shadow: 0 2px 7px #ffb6c13d;
+      pointer-events: none;
+    }
+    .pared-falsa::before {
+      background: linear-gradient(90deg, #a3a7ff 70%, #4cc9f0 100%) !important;
+      opacity: 0.85;
+    }
+    .rastro {
+      position: absolute; width: 1vw; height: 1vw;
+      background: radial-gradient(circle, #00d4ff 0%, #4df4ff 60%, #87ceeb 80%, transparent 100%);
+      border-radius: 50%; pointer-events: none; z-index: 3;
+      box-shadow: 0 0 8px #00d4ffaa, 0 0 15px #4df4ff77;
+      opacity: 0.85; 
+      animation: gotaPintura 0.2s ease-out, desvanecer 2s ease-out forwards;
+    }
+    @keyframes gotaPintura { 
+      0% { 
+        transform: scale(0.5); 
+        opacity: 1;
+        box-shadow: 0 0 12px #00d4ff, 0 0 20px #4df4ff;
+      } 
+      100%{ 
+        transform: scale(1); 
+        opacity: 0.85;
+        box-shadow: 0 0 8px #00d4ffaa, 0 0 15px #4df4ff77;
+      } 
+    }
+    @keyframes desvanecer {
+      0% { opacity: 0.85; }
+      80% { opacity: 0.4; }
+      100% { opacity: 0; transform: scale(0.8); }
+    }
+    #mensajeCentral {
+      display: none; position: fixed; left: 0; right: 0; top: 32%; margin: 0 auto; z-index: 10000;
+      font-size: 3.5rem; font-weight: bold; background: #fff9ccf2; color: #df2222; padding: 38px 10px 37px 10px;
+      border-radius: 26px; box-shadow: 0 12px 48px #f00a, 0 0 14px #fff8, 0 0 0 3px #ffdb70aa; border: 5px solid #ee7474;
+      text-align: center; animation: popup .18s cubic-bezier(.93,.09,.44,1.27); letter-spacing: 2px; max-width: 650px;
+    }
+    @keyframes popup { 0% { transform: scale(.81);} 100%{ transform: scale(1);} }
+    #cuentaRegresiva {
+      display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      z-index: 20000; font-size: 8rem; font-weight: 900; color: #ff1493;
+      background: linear-gradient(135deg, #fff9ccf2, #ffd6e0f2);
+      padding: 60px 80px; border-radius: 40px;
+      box-shadow: 0 15px 50px #ff149355, 0 0 20px #fff8, 0 0 0 5px #ffdb70aa;
+      border: 8px solid #ff69b4; text-shadow: 3px 3px 6px #fff, 0 0 15px #fcee92;
+      animation: pulsoContador 1s infinite; letter-spacing: 4px;
+    }
+    @keyframes pulsoContador { 
+      0% { transform: translate(-50%, -50%) scale(1);} 
+      50% { transform: translate(-50%, -50%) scale(1.1);} 
+      100% { transform: translate(-50%, -50%) scale(1);} 
+    }
+    #felicidadesBox {
+      display: none; position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
+      width: 50%; max-width: 680px; min-width: 300px;
+      background: #fffbedef; border: 6px dashed #fd8f44cc; border-radius: 32px;
+      padding: 35px 14px 19px 14px; z-index: 9000; text-align: center; font-size: 2.7rem;
+      font-weight: bold; color: #3d2084; box-shadow: 0 7px 24px #ffd70033;
+    }
+    #felicidadesBox .fiesta { font-size: 4rem; margin-bottom: 18px; }
+    #felicidadesBox .small { font-size: 1.5rem; color: #3339; margin-top: 18px; font-weight: 400; letter-spacing: 1.3px; }
+
+    /* Media queries mejoradas */
+    @media (max-width: 1200px) {
+      #laberinto {
+        width: 88vw;
+        height: 58vh;
+        max-height: 450px;
+      }
+      
+      h1 {
+        font-size: 2.4rem;
+      }
+      
+      #laberintoHeader {
+        font-size: 1.3rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #laberinto {
+        width: 95vw;
+        height: 55vh;
+        max-height: 380px;
+        border: 6px solid #ffb703;
+        border-radius: 25px;
+      }
+      
+      #conejo {
+        width: 5%;
+      }
+      
+      #zanahoria::before {
+        width: 6vh; height: 6vh;
+        top: -3vh; left: -3vh;
+      }
+      
+      h1 {
+        font-size: 2rem;
+        margin: 15px 0 5px;
+      }
+      
+      #laberintoHeader {
+        font-size: 1.2rem;
+        margin: 5px 0 15px;
+      }
+      
+      #felicidadesBox {
+        width: 85%;
+        font-size: 2rem;
+        top: 20px;
+      }
+      
+      #mensajeCentral {
+        font-size: 2.5rem;
+        padding: 25px 10px;
+      }
+      
+      #cuentaRegresiva {
+        font-size: 6rem;
+        padding: 40px 60px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #laberinto {
+        width: 98vw;
+        height: 50vh;
+        max-height: 320px;
+        border: 4px solid #ffb703;
+        border-radius: 20px;
+        min-height: 250px;
+      }
+      
+      #conejo {
+        width: 7%;
+      }
+      
+      #zanahoria::before {
+        width: 5vh; height: 5vh;
+        top: -2.5vh; left: -2.5vh;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      #laberintoHeader {
+        font-size: 1.1rem;
+      }
+      
+      #felicidadesBox {
+        font-size: 1.7rem;
+      }
+      
+      #mensajeCentral {
+        font-size: 2rem;
+      }
+      
+      #cuentaRegresiva {
+        font-size: 5rem;
+        padding: 30px 40px;
+      }
+    }
+
+    /* Media query específica para laptops (1024-1366px) */
+    @media (min-width: 769px) and (max-width: 1366px) {
+      #laberinto {
+        width: 85vw;
+        height: 60vh;
+        max-height: 420px;
+      }
+    }
+
+    /* Para pantallas muy grandes */
+    @media (min-width: 1367px) {
+      #laberinto {
+        width: 80vw;
+        height: 65vh;
+        max-width: 1200px;
+        max-height: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Laberinto Mágico</h1>
+  <div id="laberintoHeader">
+    Mueve el mouse para llevar al conejo a comerse la rica <b style="color:#fa7f14;">zanahoria</b>
+  </div>
+  <div class="instruccion-inicio">
+    🐰 ¡Al empezar, mueve tu mouse suavemente dentro del laberinto! 🥕
+  </div>
+  <div id="contenedorLab">
+    <div id="laberinto">
+      <img id="conejo" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f407.png" alt="Conejo" />
+      <div id="zanahoria"></div>
+      
+      <!-- Paredes exteriores -->
+      <div class="pared pared-h" style="top: 0%; left: 0%; width: 100%;"></div>
+      <div class="pared pared-h" style="top: 96%; left: 0%; width: 100%;"></div>
+      <div class="pared pared-v" style="top: 0%; left: 0%; height: 100%;"></div>
+      <div class="pared pared-v" style="top: 0%; left: 98.5%; height: 100%;"></div>
+      
+      <!-- Paredes interiores - caminos más anchos -->
+      <div class="pared pared-h" style="top: 23%; left: 14.8%; width: 70.4%;"></div>
+      <div class="pared pared-v" style="top: 23%; left: 85.2%; height: 19.2%;"></div>
+      
+      <div class="pared pared-h" style="top: 67.3%; left: 23.7%; width: 61.5%;"></div>
+      <div class="pared pared-v" style="top: 23%; left: 23.7%; height: 44.2%;"></div>
+      <div class="pared pared-v" style="top: 23%; left: 81.5%; height: 44.2%;"></div>
+      
+      <!-- Pared del lado derecho - más corta para dar acceso a la zanahoria -->
+      <div class="pared pared-v" style="top: 67.3%; left: 88.9%; height: 28.8%;"></div>
+      
+      <!-- Paredes falsas (opcional - caminos secretos) -->
+      <div class="pared pared-v pared-falsa" style="top: 32.7%; left: 40.7%; height: 34.6%;"></div>
+      <div class="pared pared-h pared-falsa" style="top: 76.9%; left: 40.7%; width: 11.1%;"></div>
+      <div class="pared pared-v pared-falsa" style="top: 76.9%; left: 51.9%; height: 9.6%;"></div>
+    </div>
+    
+    <div id="cuentaRegresiva">5</div>
+    
+    <div id="felicidadesBox">
+      <div class="fiesta">🎉🥕🎊</div>
+      <div>¡Felicidades! <br> El conejo se comió la zanahoria</div>
+      <div class="small" id="tiempoMsg"></div>
+    </div>
+    <div id="mensajeCentral"></div>
+  </div>
+  <script>
+    const laberinto = document.getElementById('laberinto');
+    const conejo = document.getElementById('conejo');
+    const zanahoria = document.getElementById('zanahoria');
+    const paredes = laberinto.querySelectorAll('.pared');
+    const felicidadesBox = document.getElementById('felicidadesBox');
+    const tiempoMsg = document.getElementById('tiempoMsg');
+    const mensajeCentral = document.getElementById('mensajeCentral');
+    const cuentaRegresiva = document.getElementById('cuentaRegresiva');
+    
+    let juegoActivo = false;
+    let tiempoInicio = null;
+
+    // Iniciar automáticamente al cargar la página
+    window.addEventListener('load', () => {
+      setTimeout(iniciarCuentaRegresiva, 1000);
+    });
+
+    function iniciarCuentaRegresiva() {
+      felicidadesBox.style.display = "none";
+      mensajeCentral.style.display = 'none';
+      cuentaRegresiva.style.display = 'block';
+      
+      let contador = 5;
+      cuentaRegresiva.textContent = contador;
+      
+      const intervaloCuenta = setInterval(() => {
+        contador--;
+        if (contador > 0) {
+          cuentaRegresiva.textContent = contador;
+        } else {
+          clearInterval(intervaloCuenta);
+          cuentaRegresiva.style.display = 'none';
+          iniciarJuego();
+        }
+      }, 1000);
+    }
+
+    function iniciarJuego() {
+      conejo.style.display = 'block';
+      // Posición inicial responsive (6% del ancho, 12% de la altura)
+      conejo.style.left = (laberinto.clientWidth * 0.06) + 'px';
+      conejo.style.top = (laberinto.clientHeight * 0.12) + 'px';
+      juegoActivo = true;
+      tiempoInicio = new Date();
+      limpiarRastro();
+    }
+
+    // El conejo sigue el mouse automáticamente cuando el juego está activo
+    document.addEventListener('mousemove', (e) => {
+      if (!juegoActivo) return;
+      const rect = laberinto.getBoundingClientRect();
+      
+      // Solo mover el conejo si el mouse está dentro del laberinto
+      if (e.clientX >= rect.left && e.clientX <= rect.right && 
+          e.clientY >= rect.top && e.clientY <= rect.bottom) {
+        
+        let x = e.clientX - rect.left - conejo.width/2;
+        let y = e.clientY - rect.top - conejo.height/2;
+        x = Math.max(0, Math.min(x, laberinto.clientWidth - conejo.width));
+        y = Math.max(0, Math.min(y, laberinto.clientHeight - conejo.height));
+        conejo.style.left = x+'px';
+        conejo.style.top  = y+'px';
+        dejarRastro(x + conejo.width/2, y + conejo.height/2);
+
+        const conejoRect = conejo.getBoundingClientRect();
+        let choca = false;
+        for (let pared of paredes) {
+          const paredRect = pared.getBoundingClientRect();
+          if (!(conejoRect.right < paredRect.left ||
+                conejoRect.left > paredRect.right ||
+                conejoRect.bottom < paredRect.top ||
+                conejoRect.top > paredRect.bottom)) {
+            choca = true;
+            break;
+          }
+        }
+        if (choca) perder();
+
+        const zanahoriaRect = zanahoria.getBoundingClientRect();
+        if (!(conejoRect.right < zanahoriaRect.left ||
+              conejoRect.left > zanahoriaRect.right ||
+              conejoRect.bottom < zanahoriaRect.top ||
+              conejoRect.top > zanahoriaRect.bottom)) {
+          ganar();
+        }
+      }
+    });
+
+    function dejarRastro(cx, cy) {
+      const gotaPintura = document.createElement('div');
+      gotaPintura.classList.add('rastro');
+      // Tamaño responsive del rastro
+      const rastroSize = Math.min(laberinto.clientWidth, laberinto.clientHeight) * 0.01;
+      gotaPintura.style.left = (cx - rastroSize/2) + 'px';
+      gotaPintura.style.top  = (cy - rastroSize/2) + 'px';
+      laberinto.appendChild(gotaPintura);
+      setTimeout(() => gotaPintura.remove(), 2200);
+    }
+
+    function limpiarRastro() {
+      laberinto.querySelectorAll('.rastro').forEach(r => r.remove());
+    }
+
+    function mostrarMensajeCentral(texto) {
+      mensajeCentral.textContent = texto;
+      mensajeCentral.style.display = "block";
+      setTimeout(()=>{ 
+        mensajeCentral.style.display = "none";
+        // Reiniciar automáticamente después de 2 segundos
+        setTimeout(iniciarCuentaRegresiva, 2000);
+      }, 3000);
+    }
+
+    function perder() {
+      juegoActivo = false;
+      conejo.style.display = 'none';
+      felicidadesBox.style.display = "none";
+      limpiarRastro();
+      mostrarMensajeCentral("❌ ¡Ay! El conejo tocó una pared");
+    }
+
+    function ganar() {
+      juegoActivo = false;
+      conejo.style.display = 'none';
+      limpiarRastro();
+      felicidadesBox.style.display = "block";
+      const tiempoFinal = new Date();
+      const segundos = ((tiempoFinal - tiempoInicio) / 1000).toFixed(2);
+      tiempoMsg.innerHTML = `⏱️ Tiempo: <b>${segundos} segundos</b>`;
+      mensajeCentral.style.display = "none";
+      
+      // Reiniciar automáticamente después de 5 segundos
+      setTimeout(iniciarCuentaRegresiva, 5000);
+    }
+  </script>
+</body>
+</html>

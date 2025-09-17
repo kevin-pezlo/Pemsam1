@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Juego de Figuras</title>
+  <style>
+    :root { --azul:#069; --amarillo:#fc0; --verde:#393; --negro:#1d1d1b; --blanco:#fff; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f3f5f8;color:#234;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+    .panel{background:#fff;border:3px solid var(--azul);border-radius:16px;box-shadow:0 16px 36px rgba(0,0,0,.14);width:min(92vw,980px);padding:18px}
+    h1{margin:0 0 8px 0;color:var(--azul)}
+    p{margin:0 0 12px 0;color:#456}
+    .score{font-weight:800;color:#024e73;margin:8px 0}
+    #shapeGame{position:relative;width:100%;height:420px;border:2px dashed var(--azul);border-radius:12px;background:#fff;overflow:hidden}
+    .target{position:absolute;width:90px;height:90px;border:3px dashed #999;border-radius:14px;opacity:.85}
+    .shape{position:absolute;width:80px;height:80px;border-radius:12px;border:2px solid #024e73;background:#e7f4fb;display:flex;align-items:center;justify-content:center;font-weight:800;color:#024e73;cursor:grab;user-select:none}
+    .btns{display:flex;gap:8px;justify-content:center;margin-top:12px}
+    button{border:2px solid var(--azul);background:var(--azul);color:#fff;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer}
+    button:hover{background:var(--amarillo);color:var(--azul)}
+  </style>
+</head>
+<body>
+  <div class="panel" role="application" aria-label="Juego de Figuras">
+    <h1>Figuras</h1>
+    <p>Arrastra cada figura a su silueta correspondiente.</p>
+    <div id="shapeScore" class="score">Figuras colocadas: 0/4</div>
+    <div id="shapeGame">
+      <!-- Targets -->
+      <div id="circleTarget" class="target" style="left:80px;top:60px;border-radius:50%"></div>
+      <div id="squareTarget" class="target" style="left:280px;top:60px"></div>
+      <div id="triangleTarget" class="target" style="left:480px;top:60px;clip-path:polygon(50% 0,0 100%,100% 100%)"></div>
+      <div id="starTarget" class="target" style="left:680px;top:60px;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"></div>
+      <!-- Shapes -->
+      <div id="circle" class="shape" draggable="true" style="left:100px;bottom:30px;border-radius:50%">●</div>
+      <div id="square" class="shape" draggable="true" style="left:300px;bottom:30px">■</div>
+      <div id="triangle" class="shape" draggable="true" style="left:500px;bottom:30px">▲</div>
+      <div id="star" class="shape" draggable="true" style="left:700px;bottom:30px">★</div>
+    </div>
+    <div class="btns"><button id="resetBtn">Reiniciar</button></div>
+  </div>
+
+  <script>
+    let shapesPlaced = 0;
+    let draggedShape = null;
+
+    const scoreEl = document.getElementById('shapeScore');
+    const gameEl = document.getElementById('shapeGame');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function setup(){
+      shapesPlaced = 0; scoreEl.textContent = 'Figuras colocadas: 0/4';
+      document.querySelectorAll('.target').forEach(t=>{ t.style.borderStyle='dashed'; });
+      const positions = {
+        circle:{left:100, bottom:30},
+        square:{left:300, bottom:30},
+        triangle:{left:500, bottom:30},
+        star:{left:700, bottom:30}
+      };
+      document.querySelectorAll('.shape').forEach(s=>{
+        const id = s.id; const pos = positions[id];
+        s.style.left = pos.left+'px'; s.style.bottom = pos.bottom+'px';
+        s.style.top = ''; s.style.opacity = '1';
+        s.draggable = true;
+      });
+      bindDnD();
+    }
+
+    function bindDnD(){
+      document.querySelectorAll('.shape').forEach(shape => {
+        shape.addEventListener('dragstart', dragStart);
+      });
+      document.querySelectorAll('.target').forEach(target => {
+        target.addEventListener('dragover', dragOver);
+        target.addEventListener('drop', drop);
+      });
+    }
+
+    function dragStart(e){
+      draggedShape = e.target;
+      e.dataTransfer.setData('text/plain', e.target.id);
+    }
+    function dragOver(e){ e.preventDefault(); }
+    function drop(e){
+      e.preventDefault();
+      const targetId = e.target.id;
+      const shapeId = targetId.replace('Target','');
+      if (draggedShape && draggedShape.id === shapeId){
+        const targetRect = e.target.getBoundingClientRect();
+        const gameRect = gameEl.getBoundingClientRect();
+        draggedShape.style.top = (targetRect.top + targetRect.height/2 - draggedShape.offsetHeight/2 - gameRect.top) + 'px';
+        draggedShape.style.left = (targetRect.left + targetRect.width/2 - draggedShape.offsetWidth/2 - gameRect.left) + 'px';
+        draggedShape.style.bottom = '';
+        draggedShape.draggable = false;
+        e.target.style.borderStyle = 'solid';
+        draggedShape.style.opacity = '0.7';
+        shapesPlaced++;
+        scoreEl.textContent = 'Figuras colocadas: ' + shapesPlaced + '/4';
+        if (shapesPlaced === 4){ setTimeout(()=> alert('¡Felicidades! Has completado el juego.'), 400); }
+      }
+    }
+
+    resetBtn.addEventListener('click', setup);
+
+    setup();
+  </script>
+</body>
+</html>
