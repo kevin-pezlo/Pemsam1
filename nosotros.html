@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros - PEMSAM</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="imagenes/iconopemsam.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Animación para el header al hacer scroll */
+        #main-header.animated-scroll {
+            animation: headerMorph 0.7s cubic-bezier(.22,.61,.36,1);
+            background: var(--azul);
+            backdrop-filter: saturate(120%) blur(6px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            transform: translateY(0) scale(1);
+        }
+        @keyframes headerMorph {
+            0% {
+                transform: translateY(-24px) scale(0.96);
+                opacity: 0;
+                box-shadow: 0 0 0 rgba(0,0,0,0);
+            }
+            60% {
+                transform: translateY(0) scale(1.01);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Subrayado multicolor para menús (hover) */
+        #main-nav a, #dropdown-menu a, .footer .footer-content a { text-decoration: none; }
+        #main-nav a:hover, #dropdown-menu a:hover, .footer .footer-content a:hover {
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          text-decoration-thickness: 3px;
+          animation: underlineHue 6s linear infinite;
+        }
+        @keyframes underlineHue {
+          0% { text-decoration-color: var(--azul); }
+          33% { text-decoration-color: var(--amarillo); }
+          66% { text-decoration-color: var(--verde); }
+          100% { text-decoration-color: var(--azul); }
+        }
+        
+        /* Estilos específicos para la página Nosotros */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding-top: 0; /* Eliminado espacio superior para que el banner quede pegado arriba */
+        }
+        
+        /* Contenido principal */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 80px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            min-height: 400px;
+        }
+        
+        .section:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .section-content {
+            flex: 1;
+            padding: 60px 50px;
+        }
+        
+        .section-image {
+            flex: 1;
+            height: 400px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--azul);
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--azul);
+            margin-bottom: 25px;
+            line-height: 1.3;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .objective-general {
+            background: linear-gradient(135deg, var(--azul) 0%, #4a6fa5 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .objectives-specific {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid var(--azul);
+        }
+        
+        .objectives-specific h3 {
+            color: var(--azul);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .objectives-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .objectives-list li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+            color: #495057;
+            line-height: 1.6;
+        }
+        
+        .objectives-list li:before {
+            content: "●";
+            color: var(--azul);
+            font-size: 1.2rem;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        .empty-space {
+            background: linear-gradient(135deg, var(--amarillo) 0%, #ff9800 100%);
+            border-radius: 8px;
+        }
+        
+         /* Alinear logo centrado (consistente en todas las páginas) */
+        .brand-row { justify-content: center; }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            body {
+                padding-top: 0;
+            }
+            
+            .section,
+            .section:nth-child(even) {
+                flex-direction: column;
+            }
+            
+            .section-content {
+                padding: 40px 30px;
+            }
+            
+            .section-image {
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 1.7rem;
+            }
+        }
+
+        /* Sección Nuestro equipo */
+        .team-section {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 28px;
+            margin-bottom: 80px;
+            border: 3px solid var(--amarillo);
+        }
+        .team-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--azul);
+            margin-bottom: 10px;
+        }
+        .team-intro {
+            font-size: 1.05rem;
+            color: #495057;
+            margin-bottom: 18px;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        .team-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 14px;
+            padding: 18px 14px;
+            text-align: center;
+            box-shadow: 0 10px 22px rgba(6,9,102,0.06);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .team-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 26px rgba(6,9,102,0.12);
+            border-color: var(--azul);
+        }
+        .team-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--azul);
+            box-shadow: 0 6px 14px rgba(6,9,102,0.15);
+            margin-bottom: 10px;
+        }
+        .team-name { font-size: 1.1rem; color: var(--azul); margin: 4px 0; }
+        .team-role { font-weight: 800; color: var(--verde); margin-bottom: 6px; }
+        .team-bio { font-size: .95rem; color: #555; }
+        @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .team-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <!-- Header igual que en index.html -->
+    <header id="main-header">
+        <div class="brand-row">
+            <img src="imagenes/colsam_logo.svg" alt="Escudo" class="escudo-fijo">
+            <div class="logo">PEMSAM</div>
+        </div>
+        <nav id="main-nav">
+            <a href="index.html">INICIO</a>
+            <a href="nosotros.html">NOSOTROS</a>
+            <a href="juegos.html">ACTIVIDADES</a>
+            <a href="contactanos.html">CONTACTANOS</a>
+            <a href="https://www.colsam.edu.co/" target="_blank">SAN ALBERTO MAGNO</a>
+        </nav>
+        <div class="hamburger" id="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <a href="index.html">INICIO</a>
+            <a href="nosotros.html">NOSOTROS</a>
+            <a href="juegos.html">ACTIVIDADES</a>
+            <a href="contactanos.html">CONTACTANOS</a>
+            <a href="https://www.colsam.edu.co/" target="_blank">SAN ALBERTO MAGNO</a>
+        </div>
+        <div id="menu-backdrop" class="menu-backdrop" aria-hidden="true"></div>
+    </header>
+
+    <div class="container">
+        <!-- Primera sección: Nosotros -->
+        <div class="section">
+            <div class="section-content">
+                <h1>Nosotros</h1>
+                <p class="description">
+                    Somos estudiantes de 11 grado comprometidos con el desarrollo de soluciones innovadoras para mejorar la educación. Nuestro equipo trabaja con dedicación para crear herramientas tecnológicas que apoyen el aprendizaje y desarrollo de los estudiantes más jóvenes.
+                </p>
+            </div>
+            <div class="section-image">
+                <img src="imagenes/file.svg" alt="Foto del equipo de estudiantes PEMSAM"/>
+            </div>
+        </div>
+        
+        <!-- Segunda sección: Objetivos -->
+        <div class="section">
+            <div class="section-content">
+                <h2>Objetivos Generales y Específicos</h2>
+                
+                <div class="objective-general">
+                    <strong>Objetivo General:</strong><br>
+                    Mejorar la motricidad de los estudiantes de primer grado del colegio San Alberto Magno mediante un aplicativo web.
+                </div>
+                
+                <div class="objectives-specific">
+                    <h3>Objetivos Específicos:</h3>
+                    <ul class="objectives-list">
+                        <li>Diseñar e implementar actividades interactivas en el aplicativo web que mejoren la motricidad de los estudiantes de primer grado.</li>
+                        <li>Construir y aplicar ejercicios lúdicos y didácticos a través del aplicativo web para mejorar las habilidades motrices de los estudiantes.</li>
+                        <li>Evaluar el progreso de las habilidades motoras de los estudiantes mediante pruebas o actividades integradas en el aplicativo web.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="section-image">
+                <img src="imagenes/PROMKAI.jpg" alt="Imagen PROMKAI"/>
+            </div>
+        </div>
+        
+        <!-- Nueva sección: Nuestro equipo -->
+        <section class="team-section">
+            <h2>Nuestro equipo</h2>
+            <p class="team-intro">Un grupo de estudiantes entusiastas de 11° comprometidos con el aprendizaje a través del juego.</p>
+            <div class="team-grid">
+                <article class="team-card">
+                    <img class="team-avatar" src="https://picsum.photos/seed/ale/240/240" alt="Foto de Alejandra" loading="lazy">
+                    <h3 class="team-name">Kevin L</h3>
+                </article>
+                <article class="team-card">
+                    <img class="team-avatar" src="https://picsum.photos/seed/mateo/240/240" alt="Foto de Mateo" loading="lazy">
+                    <h3 class="team-name">Santiago A</h3>
+                </article>
+                <article class="team-card">
+                    <img class="team-avatar" src="https://picsum.photos/seed/valen/240/240" alt="Foto de Valentina" loading="lazy">
+                    <h3 class="team-name">Camilo P</h3>
+                </article>
+                <article class="team-card">
+                    <img class="team-avatar" src="https://picsum.photos/seed/santi/240/240" alt="Foto de Santiago" loading="lazy">
+                    <h3 class="team-name">Emelyn R</h3>
+                </article>
+                <article class="team-card">
+                    <img class="team-avatar" src="https://picsum.photos/seed/cami/240/240" alt="Foto de Camila" loading="lazy">
+                    <h3 class="team-name">Matias H</h3>
+                </article>
+                <article class="team-card">
+                    <img class="team-avatar" src="https://picsum.photos/seed/juan/240/240" alt="Foto de Juan" loading="lazy">
+                    <h3 class="team-name">Sharon M</h3>
+                </article>
+                 <article class="team-card">
+                    <img class="team-avatar" src="https://picsum.photos/seed/juan/240/240" alt="Foto de Juan" loading="lazy">
+                    <h3 class="team-name">Jonathan R</h3>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contacto" class="footer">
+        <div class="footer-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="var(--azul)"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="var(--azul)"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="var(--azul)"></path>
+            </svg>
+        </div>
+        
+        <div class="footer-content footer-inline">
+          <div class="footer-brand">
+            <img src="imagenes/iconopemsam.svg" alt="PEMSAM" />
+          </div>
+          <div class="footer-column">
+            <h3>Contacto</h3>
+            <div class="contact-info">
+              <p><i class="fas fa-envelope"></i> pemsam@mail.colsam.edu.co</p>
+              <p><i class="fas fa-map-marker-alt"></i> Colegio San Alberto Magno Cra. 3c #9171, Barranquilla, Atlántico</p>
+            </div>
+            <div class="social-links">
+              <a href="https://www.facebook.com/colegiosanalbertomagnobarranquilla/" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://www.instagram.com/colsambarranquilla/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024-2025 PEMSAM. Todos los derechos reservados.</p>
+            <div class="footer-links">
+                <a href="AUTORIZACION-PARA-EL-TRATAMIENTO-DE-DATOS-PERSONALES-.pdf" target="_blank" rel="noopener noreferrer">Tratamiento de datos</a>
+                <a href="tyc.html">Términos y Condiciones</a>
+                <a href="faqs.html">FAQS</a>
+                <a href="#">Cookies</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      // Mostrar footer cuando entra al viewport
+      (function(){
+        try{
+          var footer = document.querySelector('.footer');
+          if(!footer) return;
+          var obs = new IntersectionObserver(function(entries, o){
+            entries.forEach(function(e){
+              if(e.isIntersecting){ footer.classList.add('is-visible'); o.unobserve(e.target); }
+            });
+          }, { threshold: 0.15 });
+          obs.observe(footer);
+        }catch(e){}
+      })();
+    </script>
+
+    <script>
+    // Sticky header, hide nav, show hamburger + animación scroll
+    const header = document.getElementById('main-header');
+    const nav = document.getElementById('main-nav');
+    const hamburger = document.getElementById('hamburger-menu');
+    const dropdown = document.getElementById('dropdown-menu');
+
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function handleHeaderScroll() {
+        if(window.scrollY > 50) {
+            header.classList.add('sticky');
+            header.classList.add('animated-scroll');
+            nav.classList.add('hide');
+            hamburger.classList.add('show');
+        } else {
+            header.classList.remove('sticky');
+            header.classList.remove('animated-scroll');
+            nav.classList.remove('hide');
+            hamburger.classList.remove('show');
+            // Asegurar cierre del menú y reset del icono
+            dropdown.classList.remove('show');
+            hamburger.classList.remove('active');
+            const bd = document.getElementById('menu-backdrop');
+            if (bd) bd.classList.remove('show');
+        }
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                handleHeaderScroll();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    const backdrop = document.getElementById('menu-backdrop');
+    function openMenu(){ dropdown.classList.add('show'); hamburger.classList.add('active'); backdrop.classList.add('show'); }
+    function closeMenu(){ dropdown.classList.remove('show'); hamburger.classList.remove('active'); backdrop.classList.remove('show'); }
+
+    hamburger.addEventListener('click', () => {
+        if (dropdown.classList.contains('show')) { closeMenu(); } else { openMenu(); }
+    });
+    document.querySelectorAll('#dropdown-menu a').forEach(a=>{
+        a.addEventListener('click', ()=> closeMenu());
+    });
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+    window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMenu(); });
+    </script>
+</body>
+</html>

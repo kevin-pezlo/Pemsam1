@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrera de Obstáculos - PEMSAM</title>
+  <style>
+    :root{
+
+      --azul:#03658C; --amarillo:#F2B705; --rojo:#E74C3C; --verde:#2ECC71; --cielo:#EAF6FF; --cielo2:#CDEBFF;
+      --suelo:#C3D38C; --suelo2:#98B06F; --montana:#9BB8C7; --montana2:#7EA0B3;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif; background:#f7fbff; color:#024}
+    .wrap{max-width:900px; margin:0 auto; padding:16px}
+    .panel{background:#fff; border:2px solid var(--azul); border-radius:14px; padding:14px; box-shadow:0 10px 22px rgba(6,9,102,0.08)}
+    h1{margin:0 0 8px; font-size:1.25rem; color:var(--azul)}
+
+    .hud{display:flex; align-items:center; gap:10px; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap}
+    .scoreboard{font-weight:800; color:#024; font-size:1rem}
+    .hud .btn{background:var(--azul); color:#fff; border:0; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:800}
+    .hud .btn:hover{background:var(--amarillo); color:var(--azul)}
+
+    .game{position:relative; width:720px; max-width:95vw; aspect-ratio: 3 / 1.2; margin:12px auto; border:2px solid var(--azul); border-radius:14px; overflow:hidden; background:linear-gradient(180deg,var(--cielo),var(--cielo2));}
+    .game-inner{position:absolute; inset:0;}
+
+    /* Escena de fondo */
+    .mountains{position:absolute; left:0; right:0; bottom:38px; top:28%; pointer-events:none; overflow:hidden}
+    .mountains::before, .mountains::after{content:""; position:absolute; bottom:0; width:160%; height:140%; background-repeat:repeat-x; background-size: auto 100%;}
+    .mountains::before{left:-10%; background-image: radial-gradient(circle at 30% 90%, var(--montana) 0 32%, transparent 33%), radial-gradient(circle at 70% 100%, var(--montana) 0 28%, transparent 29%), radial-gradient(circle at 120% 100%, var(--montana) 0 22%, transparent 23%); opacity:.6;}
+    .mountains::after{left:-20%; background-image: radial-gradient(circle at 10% 100%, var(--montana2) 0 30%, transparent 31%), radial-gradient(circle at 60% 110%, var(--montana2) 0 24%, transparent 25%), radial-gradient(circle at 100% 100%, var(--montana2) 0 20%, transparent 21%); opacity:.5;}
+
+    .cloud{position:absolute; top:10%; width:120px; height:40px; background:#fff; border-radius:40px; box-shadow: 30px 10px 0 10px #fff, 60px 0 0 0 #fff; opacity:.9; filter: drop-shadow(0 2px 6px rgba(0,0,0,.1)); animation: moveCloud 30s linear infinite}
+    .cloud.small{transform: scale(.7); opacity:.8; animation-duration: 40s}
+    .cloud.large{transform: scale(1.1); opacity:.95; animation-duration: 26s}
+    @keyframes moveCloud { from{ transform: translateX(-20%) scale(var(--scale,1)); } to { transform: translateX(120%) scale(var(--scale,1)); } }
+
+    .ground{position:absolute; left:0; right:0; bottom:0; height:38px; background: linear-gradient(180deg, var(--suelo), var(--suelo2)); border-top:2px solid #7a9155}
+    .ground::after{content:""; position:absolute; left:0; right:0; top:0; height:100%; background: repeating-linear-gradient(90deg, rgba(255,255,255,.2) 0 12px, transparent 12px 24px); opacity:.3; animation: groundScroll var(--ground-speed, 1.2s) linear infinite}
+    @keyframes groundScroll { from{ background-position:0 0;} to{ background-position: -24px 0;} }
+
+    /* Entidades */
+    .character{position:absolute; bottom:38px; left:80px; width:38px; height:42px; background:linear-gradient(180deg,#6EC1FF,#2D8BBA); border:2px solid #0d5f80; border-radius:10px 10px 12px 12px; box-shadow:0 6px 12px rgba(0,0,0,.18)}
+    .character::before{content:""; position:absolute; left:8px; top:10px; width:8px; height:8px; background:#fff; border-radius:50%; box-shadow: 14px 0 0 0 #fff}
+    .character::after{content:""; position:absolute; left:10px; bottom:6px; width:18px; height:6px; background:#0d5f80; border-radius:6px}
+
+    .obstacle{position:absolute; bottom:38px; width:24px; height:30px; background:var(--rojo); border:2px solid #b63c32; border-radius:6px; box-shadow:0 4px 8px rgba(0,0,0,.18)}
+    .obstacle.cactus{width:26px; height:36px; background:#2E8B57; border-color:#1e5b39; border-radius:8px}
+
+    /* UI overlays */
+    .overlay{position:absolute; inset:0; background:rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center; text-align:center; padding:16px; z-index:4}
+    .overlay .box{background:#fff; border:2px solid var(--azul); border-radius:14px; padding:16px 18px; max-width:520px; box-shadow:0 10px 22px rgba(6,9,102,0.12)}
+    .overlay h2{margin:0 0 6px; color:var(--azul)}
+    .overlay p{margin:6px 0 0}
+    .overlay .actions{display:flex; gap:10px; justify-content:center; margin-top:12px}
+    .overlay .btn{background:var(--azul); color:#fff; border:0; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:800}
+    .overlay .btn:hover{background:var(--amarillo); color:var(--azul)}
+
+    .hint{font-size:.95rem; color:#024; margin-top:6px}
+
+    /* Botón salto móvil */
+    .jump-btn{position:absolute; right:14px; bottom:52px; z-index:3; background:var(--amarillo); color:var(--azul); border:2px solid var(--azul); border-radius:50%; width:60px; height:60px; font-weight:900; box-shadow:0 8px 14px rgba(0,0,0,.2); display:none}
+    @media (hover:none) and (pointer:coarse){ .jump-btn{ display:block; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Carrera de Obstáculos</h1>
+      <div class="hud">
+        <div class="scoreboard">Puntuación: <span id="score">0</span> | Nivel: <span id="level">1</span> | Récord: <span id="best">0</span></div>
+        <div>
+          <button id="pauseBtn" class="btn" aria-pressed="false">Pausar</button>
+          <button id="restartBtn" class="btn">Reiniciar</button>
+        </div>
+      </div>
+
+      <div id="game" class="game" aria-label="Juego Carrera de Obstáculos" role="application" tabindex="0">
+        <div class="game-inner">
+          <div class="mountains"></div>
+          <div class="cloud small" style="top:12%; left:-15%; --scale:.8;"></div>
+          <div class="cloud" style="top:6%; left:-35%; --scale:1;"></div>
+          <div class="cloud large" style="top:18%; left:-55%; --scale:1.2;"></div>
+          <div id="character" class="character" aria-label="Jugador"></div>
+          <div class="ground"></div>
+          <button id="jumpBtn" class="jump-btn" aria-label="Saltar">⨀</button>
+          <div id="startOverlay" class="overlay" aria-hidden="false">
+            <div class="box">
+              <h2>Corre y salta</h2>
+              <p>Evita los obstáculos para conseguir la mejor puntuación.</p>
+              <p class="hint">Controles: Espacio o Flecha arriba para saltar. P para pausar.</p>
+              <div class="actions">
+                <button id="startBtn" class="btn">Comenzar</button>
+              </div>
+            </div>
+          </div>
+          <div id="gameOverOverlay" class="overlay" style="display:none" aria-hidden="true">
+            <div class="box">
+              <h2>¡Fin del juego!</h2>
+              <p id="finalScore">Puntuación: 0</p>
+              <p id="finalBest">Récord: 0</p>
+              <div class="actions">
+                <button id="retryBtn" class="btn">Reintentar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="hint">Consejo: Mantén presionada la tecla de salto para un impulso ligeramente mayor. La velocidad aumenta con el nivel.</p>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const game = document.getElementById('game');
+      const characterEl = document.getElementById('character');
+      const scoreEl = document.getElementById('score');
+      const levelEl = document.getElementById('level');
+      const bestEl = document.getElementById('best');
+      const restartBtn = document.getElementById('restartBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const startBtn = document.getElementById('startBtn');
+      const retryBtn = document.getElementById('retryBtn');
+      const startOverlay = document.getElementById('startOverlay');
+      const gameOverOverlay = document.getElementById('gameOverOverlay');
+      const jumpBtn = document.getElementById('jumpBtn');
+      const finalScore = document.getElementById('finalScore');
+      const finalBest = document.getElementById('finalBest');
+
+      // Estado del juego
+      let score = 0, best = parseInt(localStorage.getItem('obstacle_best')||'0',10);
+      let level = 1;
+      let running = false, paused = false, gameOver = false;
+      let lastTime = 0; // timestamp del RAF
+
+      // Parámetros del mundo
+      const groundH = 38; // altura del suelo (en CSS coincide)
+      const char = {
+        x: 80,
+        y: 0, // desde el suelo
+        w: 38, h: 42,
+        vy: 0,
+        gravity: 1600, // px/s^2
+        jumpVel: 560,  // px/s
+        holdingJump: false,
+        grounded: true,
+      };
+      const obstacles = [];
+      let spawnTimer = 0; // s hasta próximo obstáculo
+
+      function reset(){
+        score = 0; level = 1; updateHud();
+        paused = false; gameOver = false; running = false;
+        obstacles.splice(0, obstacles.length);
+        char.y = 0; char.vy = 0; char.grounded = true; char.holdingJump = false;
+        updateCharacter();
+        clearObstaclesDom();
+        showStart();
+      }
+
+      function updateHud(){
+        scoreEl.textContent = String(Math.floor(score));
+        levelEl.textContent = String(level);
+        bestEl.textContent = String(best);
+      }
+
+      function showStart(){
+        startOverlay.style.display = 'flex';
+        startOverlay.setAttribute('aria-hidden','false');
+        gameOverOverlay.style.display = 'none';
+        gameOverOverlay.setAttribute('aria-hidden','true');
+      }
+
+      function showGameOver(){
+        gameOverOverlay.style.display = 'flex';
+        gameOverOverlay.setAttribute('aria-hidden','false');
+        startOverlay.style.display = 'none';
+        startOverlay.setAttribute('aria-hidden','true');
+        finalScore.textContent = 'Puntuación: ' + Math.floor(score);
+        finalBest.textContent = 'Récord: ' + Math.floor(best);
+      }
+
+      function start(){
+        if (running) return;
+        running = true; paused = false; gameOver = false; spawnTimer = 0; lastTime = 0;
+        startOverlay.style.display = 'none'; startOverlay.setAttribute('aria-hidden','true');
+        gameOverOverlay.style.display = 'none'; gameOverOverlay.setAttribute('aria-hidden','true');
+        // Focus para capturar teclas dentro del iframe
+        setTimeout(()=> game.focus(), 30);
+        requestAnimationFrame(loop);
+      }
+
+      function end(){
+        running = false; gameOver = true;
+        if (score > best){ best = Math.floor(score); localStorage.setItem('obstacle_best', String(best)); }
+        showGameOver();
+      }
+
+      function pauseToggle(){
+        if (!running || gameOver) return;
+        paused = !paused;
+        pauseBtn.textContent = paused ? 'Reanudar' : 'Pausar';
+        pauseBtn.setAttribute('aria-pressed', String(paused));
+        if (!paused){ lastTime = 0; requestAnimationFrame(loop); }
+      }
+
+      function clearObstaclesDom(){
+        game.querySelectorAll('.obstacle').forEach(o=>o.remove());
+      }
+
+      function spawnObstacle(){
+        const el = document.createElement('div');
+        const isCactus = Math.random() < 0.55;
+        el.className = 'obstacle' + (isCactus ? ' cactus' : '');
+        const h = isCactus ? (28 + Math.random()*16) : (20 + Math.random()*14);
+        const w = isCactus ? 22 + Math.random()*8 : 22 + Math.random()*6;
+        el.style.width = w + 'px';
+        el.style.height = h + 'px';
+        el.style.left = game.clientWidth + 'px';
+        el.style.bottom = groundH + 'px';
+        game.appendChild(el);
+        obstacles.push({ x: game.clientWidth, y: groundH, w, h, el, scored:false });
+      }
+
+      function updateCharacter(){
+        characterEl.style.left = char.x + 'px';
+        characterEl.style.bottom = (groundH + char.y) + 'px';
+      }
+
+      function rectsOverlap(a, b){
+        return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+      }
+
+      function levelFromScore(){
+        const l = 1 + Math.floor(score / 120);
+        level = Math.min(12, l);
+      }
+
+      function loop(ts){
+        if (!running || paused) return;
+        const dt = lastTime ? (ts - lastTime) / 1000 : 0; // segundos
+        lastTime = ts;
+
+        const speed = 200 + Math.min(score * 0.7, 260); // px/s escala con la puntuación
+        // Ajustar la velocidad de scroll del suelo para reflejar la velocidad del juego (más rápido a mayor puntuación)
+        game.style.setProperty('--ground-speed', (1.2 * 200 / speed).toFixed(2) + 's');
+
+        // Física del personaje
+        if (!char.grounded){
+          // Ajuste salto prolongado al mantener la tecla un instante
+          const boost = char.holdingJump ? 1.06 : 1.0;
+          char.vy -= char.gravity * dt;
+          char.y += char.vy * dt * boost;
+          if (char.y <= 0){ char.y = 0; char.vy = 0; char.grounded = true; }
+        }
+
+        // Obstáculos
+        spawnTimer -= dt;
+        if (spawnTimer <= 0){
+          spawnObstacle();
+          // Próximo spawn aleatorio dependiente del nivel
+          const base = Math.max(0.7 - level*0.03, 0.28);
+          spawnTimer = base + Math.random() * (0.55 - Math.min(level*0.02, 0.25));
+        }
+
+        for (let i = obstacles.length-1; i >= 0; i--){
+          const o = obstacles[i];
+          o.x -= speed * dt;
+          o.el.style.left = o.x + 'px';
+          if (!o.scored && o.x + o.w < char.x){
+            o.scored = true; score += 5; // pasar obstáculo suma 5
+          }
+          // Colisión AABB (coordenadas en px dentro del contenedor)
+          const a = { x: char.x, y: groundH + char.y, w: char.w, h: char.h };
+          const b = { x: o.x, y: o.y, w: o.w, h: o.h };
+          if (rectsOverlap(a,b)) { end(); return; }
+          // Fuera de la pantalla
+          if (o.x + o.w < -8){ o.el.remove(); obstacles.splice(i,1); }
+        }
+
+        // Progreso y nivel
+        score += dt * 2; // sumar por distancia recorrida
+        levelFromScore();
+        updateHud();
+        updateCharacter();
+        requestAnimationFrame(loop);
+      }
+
+      function jump(hold){
+        if (gameOver || !running || paused) return;
+        if (char.grounded){
+          char.grounded = false;
+          char.vy = char.jumpVel;
+          char.holdingJump = !!hold;
+        }
+      }
+
+      function onKeyDown(e){
+        if (e.repeat) return;
+        if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W'){
+          e.preventDefault(); jump(true);
+        } else if (e.key === 'p' || e.key === 'P'){
+          e.preventDefault(); pauseToggle();
+        } else if (e.key === 'Enter'){
+          if (!running) { e.preventDefault(); start(); }
+        }
+      }
+      function onKeyUp(e){
+        if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W'){
+          char.holdingJump = false;
+        }
+      }
+
+      // Controles táctiles/clic
+      game.addEventListener('pointerdown', (e)=>{
+        if (!running && !gameOver){ start(); return; }
+        if (gameOver){ return; }
+        jump(true);
+      });
+      game.addEventListener('pointerup', ()=>{ char.holdingJump = false; });
+      jumpBtn.addEventListener('pointerdown', (e)=>{ e.preventDefault(); jump(true); });
+      jumpBtn.addEventListener('pointerup', ()=>{ char.holdingJump = false; });
+
+      // Botones de UI
+      pauseBtn.addEventListener('click', pauseToggle);
+      restartBtn.addEventListener('click', ()=>{ reset(); });
+      startBtn.addEventListener('click', ()=>{ start(); });
+      retryBtn.addEventListener('click', ()=>{ reset(); start(); });
+
+      // Teclado
+      game.addEventListener('keydown', onKeyDown);
+      game.addEventListener('keyup', onKeyUp);
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+
+      // Mantener foco en el área de juego
+      game.addEventListener('click', ()=> game.focus());
+      window.addEventListener('beforeunload', ()=>{ running = false; });
+
+      // Inicializar
+      bestEl.textContent = String(best);
+      reset();
+    })();
+  </script>
+</body>
+</html>

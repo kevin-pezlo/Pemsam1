@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ascenso al Árbol - PEMSAM</title>
+  <style>
+    :root{ --azul:#03658C; --amarillo:#F2B705; --rojo:#F20505; --marron1:#7a4a21; --marron2:#a06a3f; --verde:#2ecc71; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif; background:#f7fbff; color:#024}
+    .wrap{max-width:900px;margin:0 auto;padding:16px}
+    .panel{background:#fff;border:2px solid var(--azul);border-radius:12px;padding:14px;box-shadow:0 10px 22px rgba(6,9,102,0.08)}
+    h1{margin:0 0 8px;font-size:1.25rem;color:var(--azul)}
+    .scoreboard{font-weight:700;color:#024;margin-bottom:8px}
+    .controls{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}
+    .btn{background:var(--azul);color:#fff;border:0;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:700}
+    .btn:hover{background:var(--amarillo);color:var(--azul)}
+
+    #game{position:relative;width:180px;height:420px;margin:12px auto;border:2px solid var(--azul);border-radius:10px;overflow:hidden;background:linear-gradient(#e0f7ff,#f0fff0)}
+    #trunk{position:absolute;left:85px;top:0;width:10px;height:100%;background:linear-gradient(180deg,#81512b,#a06a3f);opacity:.9;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+    .branch{position:absolute;height:12px;border-radius:8px;background:linear-gradient(180deg,var(--marron1),var(--marron2)),repeating-linear-gradient(45deg, rgba(255,255,255,0.06) 0 2px, rgba(0,0,0,0.06) 2px 4px);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.25);z-index:2}
+    #climber{position:absolute;left:80px;bottom:20px;width:20px;height:20px;background:#F20505;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,0.3);z-index:4}
+    #goal{position:absolute;width:12px;height:12px;border-radius:50%;background:#F20505;box-shadow:0 0 0 2px #fff, 0 0 8px rgba(242,5,5,.6);z-index:5}
+
+    .msg{font-weight:700;color:#338C30;margin-top:6px;min-height:20px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Ascenso al Árbol</h1>
+      <div class="scoreboard">Altura: <span id="height">0</span> | Puntos: <span id="score">0</span> | Nivel: <span id="level">1</span></div>
+      <div id="game" aria-label="Juego ascenso al árbol">
+        <div id="trunk"></div>
+        <div id="climber"></div>
+        <div id="goal" hidden></div>
+      </div>
+      <div class="controls">
+        <button id="restart" class="btn">Reiniciar</button>
+        <span>Controles: A/D o Flechas (izquierda/derecha). Debes elegir la rama correcta para subir.</span>
+      </div>
+      <div id="message" class="msg"></div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const game = document.getElementById('game');
+      const climber = document.getElementById('climber');
+      const goal = document.getElementById('goal');
+      const heightEl = document.getElementById('height');
+      const scoreEl = document.getElementById('score');
+      const levelEl = document.getElementById('level');
+      const restartBtn = document.getElementById('restart');
+      const msgEl = document.getElementById('message');
+
+      let branchPattern = [];
+      let branchHeight = 40; // separación vertical de ramas
+      let totalSteps = 0; // calculado según alto del marco
+      let treeLevel = 1; const MAX_TREE_LEVEL = 8;
+      let climberPos = 0; // índice de nivel de altura (0 base)
+      let climberSide = 'center'; // 'left'|'right'|'center'
+      let score = 0; let fails = 0; const maxFails = 3;
+      let finished = false;
+
+      const leftX = 20, centerX = 80, rightX = 120; // posiciones horizontales para el personaje
+
+      function calcSteps(){
+        totalSteps = Math.max(6, Math.floor((game.clientHeight - 30) / branchHeight));
+      }
+
+      function generatePattern(level, len){
+        const pat = [];
+        let side = Math.random() < 0.5 ? 'left' : 'right';
+        for (let i = 0; i < len; i++){
+          if (level >= 3 && Math.random() < Math.min(0.25 + level*0.03, 0.55)){
+            // mantener lado para dificultad
+          } else {
+            side = side === 'left' ? 'right' : 'left';
+          }
+          pat.push(side);
+        }
+        return pat;
+      }
+
+      function clearLevel(){
+        Array.from(game.querySelectorAll('.branch')).forEach(e=>e.remove());
+      }
+
+      function buildLevel(){
+        if (finished) return;
+        clearLevel(); msgEl.textContent = '';
+        calcSteps();
+        branchPattern = generatePattern(treeLevel, totalSteps);
+        let bw = Math.max(36, 56 - treeLevel * 2);
+        bw = Math.min(bw, Math.floor(game.clientWidth * 0.45));
+        for (let i = 0; i < totalSteps; i++){
+          const side = branchPattern[i];
+          const y = i * branchHeight + 10;
+          const b = document.createElement('div');
+          b.className = 'branch';
+          b.style.width = bw + 'px';
+          b.style.bottom = y + 'px';
+          if (side === 'left') { b.style.left = '0px'; }
+          else { b.style.right = '0px'; }
+          game.appendChild(b);
+        }
+        // Objetivo visual en la última rama
+        const lastY = (totalSteps - 1) * branchHeight + 10;
+        const lastSide = branchPattern[totalSteps - 1];
+        goal.hidden = false;
+        const centerX = lastSide === 'left' ? (bw / 2) : (game.clientWidth - bw / 2);
+        goal.style.left = centerX + 'px';
+        goal.style.bottom = (lastY + 15) + 'px';
+      }
+
+      function updateUI(){
+        heightEl.textContent = String(climberPos);
+        scoreEl.textContent = String(score);
+        levelEl.textContent = String(treeLevel);
+      }
+
+      function placeClimber(){
+        const x = climberSide === 'left' ? leftX : (climberSide === 'right' ? rightX : centerX);
+        climber.style.left = x + 'px';
+        climber.style.bottom = (climberPos * branchHeight + 20) + 'px';
+        updateUI();
+      }
+
+      function nextLevel(){
+        treeLevel++;
+        if (treeLevel > MAX_TREE_LEVEL){
+          finished = true; msgEl.textContent = '¡Felicitaciones! Has coronado el árbol. Puntaje: ' + score + '.';
+          setTimeout(()=>{ // reiniciar ciclo
+            finished = false; treeLevel = 1; climberPos = 0; climberSide = 'center'; score = 0; fails = 0; buildLevel(); placeClimber();
+          }, 3000);
+          return;
+        }
+        climberPos = 0; climberSide = 'center'; fails = 0; buildLevel(); placeClimber();
+      }
+
+      function move(e){
+        if (finished) return;
+        const key = e.key;
+        const isLeft = key === 'a' || key === 'A' || key === 'ArrowLeft';
+        const isRight = key === 'd' || key === 'D' || key === 'ArrowRight';
+        if (!isLeft && !isRight) return;
+        e.preventDefault();
+        if (climberPos >= totalSteps - 1) return; // ya está en la última rama visible
+
+        const nextSide = branchPattern[(climberPos + 1) % branchPattern.length];
+        let ok = false;
+        if (isLeft && nextSide === 'left'){ ok = true; climberSide = 'left'; }
+        if (isRight && nextSide === 'right'){ ok = true; climberSide = 'right'; }
+
+        if (ok){
+          climberPos++; score++; placeClimber();
+          if (climberPos >= totalSteps - 1){ nextLevel(); }
+        } else {
+          fails++;
+          climberSide = 'center';
+          if (fails >= maxFails){
+            msgEl.textContent = '¡Vuelve a intentarlo! Has fallado 3 veces.';
+            climberPos = 0; score = Math.max(0, score - 1); fails = 0; // penalización ligera
+          } else { if (climberPos > 0) climberPos--; }
+          placeClimber();
+        }
+      }
+
+      function restart(){
+        finished = false; treeLevel = 1; climberPos = 0; climberSide = 'center'; score = 0; fails = 0; buildLevel(); placeClimber(); msgEl.textContent='';
+      }
+
+      // Init
+      buildLevel();
+      placeClimber();
+
+      // Events
+      document.addEventListener('keydown', move);
+      restartBtn.addEventListener('click', restart);
+      window.addEventListener('beforeunload', ()=> document.removeEventListener('keydown', move));
+    })();
+  </script>
+</body>
+</html>

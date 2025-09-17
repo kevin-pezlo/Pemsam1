@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rompecabezas 15 piezas - PEMSAM</title>
+  <style>
+    :root{
+      --azul:#03658C; --amarillo:#F2B705; --verde:#2ecc71; --bg:#f7fbff; --negro:#024;
+    }
+    *{ box-sizing:border-box }
+    html, body{ height:100%; }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif; background:var(--bg); color:var(--negro); }
+    .wrap{ max-width:1080px; margin:0 auto; padding:16px }
+
+    .panel{ background:#fff; border:2px solid var(--azul); border-radius:14px; padding:14px; box-shadow:0 10px 22px rgba(6,9,102,.08); text-align:center }
+    h1{ margin:0 0 8px; font-size:1.25rem; color:var(--azul) }
+
+    .hud{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px; font-weight:700; }
+    .badge{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--azul); border-radius:10px; padding:4px 8px; color:var(--azul); background:#f0f8ff }
+    .btn{ background:var(--azul); color:#fff; border:0; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:700 }
+    .btn:hover{ background:var(--amarillo); color:var(--azul) }
+
+    /* Tablero principal con vista cenital */
+     .board{ position:relative; width:1100px; height:740px; margin:12px auto; border-radius:12px; background:linear-gradient(180deg,#fff,#fefdf6); border:2px solid rgba(0,0,0,.06); box-shadow:0 16px 34px rgba(0,0,0,.08) inset }
+
+    /* Área objetivo centrada con marco punteado y guía de imagen translúcida */
+    .target{ position:absolute; border:3px dashed var(--amarillo); border-radius:10px; background:#fff; overflow:hidden }
+    .target .guide{ position:absolute; inset:0; background-size:cover; background-position:center; opacity:.25; filter:saturate(110%); pointer-events:none }
+
+    /* Piezas y ranuras */
+    canvas.piece, canvas.slot{ position:absolute; }
+
+    canvas.slot{ z-index:2; pointer-events:none }
+    canvas.piece{ z-index:3; cursor:grab; transition: transform .12s ease, left .15s ease, top .15s ease, box-shadow .2s ease }
+    canvas.piece:active{ cursor:grabbing }
+    canvas.piece.locked{ cursor:default; pointer-events:none; filter:saturate(110%) }
+    canvas.piece.dragging{ transform: scale(1.06); box-shadow: 0 10px 20px rgba(0,0,0,.25); }
+    canvas.slot.highlight{ outline: 3px solid var(--azul); outline-offset: -3px; }
+    canvas.slot.near{ box-shadow: 0 0 0 4px rgba(242,183,5,0.35) inset, 0 0 12px rgba(242,183,5,0.45); }
+
+    /* Efecto visual sutil al encajar */
+    @keyframes snapIn{ 0%{ transform:scale(1)} 50%{ transform:scale(1.06)} 100%{ transform:scale(1)} }
+    .snap{ animation: snapIn .18s ease-out }
+
+    .legend{ font-size:.95rem; color:var(--negro); margin-top:6px }
+    .congrats{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(46,204,113,0.08); border:3px solid #2ecc71; border-radius:12px; color:#2ecc71; font-weight:800; font-size:1.4rem; text-shadow:0 1px 0 #fff; pointer-events:none }
+    .congrats[hidden]{ display:none !important; }
+
+    /* Responsivo simple */
+    @media (max-width: 1020px){
+      .board{ transform: scale(.9); transform-origin: top center; height: 620px; }
+    }
+    @media (max-width: 920px){
+      .board{ transform: scale(.8); }
+    }
+    @media (max-width: 820px){
+      .board{ transform: scale(.7); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Rompecabezas 15 piezas</h1>
+      <div class="hud">
+        <span class="badge">⏱️ Tiempo: <span id="time">0</span>s</span>
+        <span class="badge">🧩 Piezas: <span id="done">0</span>/15</span>
+        <button id="restart" class="btn">Reiniciar</button>
+      </div>
+      <div id="board" class="board" aria-label="Tablero de rompecabezas con guía y piezas alrededor">
+        <div id="target" class="target" aria-label="Área objetivo del rompecabezas">
+          <div id="guide" class="guide" aria-hidden="true"></div>
+        </div>
+        <div id="congrats" class="congrats" hidden>¡Felicitaciones! Rompecabezas completado.</div>
+      </div>
+      <div class="legend">Arrastra cada pieza al lugar correcto. Si está cerca del sitio indicado, encajará sola y quedará bloqueada.</div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const rows = 3, cols = 5; // 15 piezas
+    const total = rows * cols;
+    const imageSrc = '../../imagenes/3.jpg'; // imagen existente en el proyecto
+
+    const board = document.getElementById('board');
+    const target = document.getElementById('target');
+    const guide = document.getElementById('guide');
+    const timeEl = document.getElementById('time');
+    const doneEl = document.getElementById('done');
+    const restartBtn = document.getElementById('restart');
+
+    let pieceW = 0, pieceH = 0;
+    let timer = 0, timerId = null, done = 0;
+    let img = new Image();
+
+    img.onload = setup;
+    img.onerror = function(){ alert('No se pudo cargar la imagen del rompecabezas.'); };
+    img.src = imageSrc;
+
+    function clearBoard(){
+      if (timerId) { clearInterval(timerId); timerId = null; }
+      while (board.querySelector('canvas')){
+        const c = board.querySelector('canvas');
+        c.remove();
+      }
+      timer = 0; done = 0; timeEl.textContent = '0'; doneEl.textContent = '0';
+    }
+
+    // Genera patrones de bordes para que las piezas interiores se complementen (+1/-1)
+    function generatePatterns(){
+      const grid = Array.from({length: rows}, () => Array(cols).fill(null));
+      for (let r=0; r<rows; r++){
+        for (let c=0; c<cols; c++){
+          const top    = (r===0) ? 0 : -grid[r-1][c].bottom;
+          const left   = (c===0) ? 0 : -grid[r][c-1].right;
+          const right  = (c===cols-1) ? 0 : (Math.random()<0.5 ? 1 : -1);
+          const bottom = (r===rows-1) ? 0 : (Math.random()<0.5 ? 1 : -1);
+          grid[r][c] = { top, right, bottom, left };
+        }
+      }
+      return grid;
+    }
+
+    // Dibuja la silueta con pestañas/entrantes clásicas
+    function drawPieceShape(ctx, w, h, pattern){
+      const r = Math.min(w, h) * 0.22; // radio del pomo
+      const k = r * 0.55;               // cuello del pomo
+      const {top, right, bottom, left} = pattern;
+
+      ctx.beginPath();
+      // Arrancamos en la esquina superior izquierda
+      ctx.moveTo(0, 0);
+
+      // Lado superior (izq -> der)
+      if (top === 0) {
+        ctx.lineTo(w, 0);
+      } else {
+        ctx.lineTo(w/2 - k, 0);
+        const dir = top; // 1 saliente, -1 entrante
+        ctx.bezierCurveTo(w/2 - k, 0, w/2 - k, -dir*k, w/2, -dir*r);
+        ctx.bezierCurveTo(w/2 + k, -dir*k, w/2 + k, 0, w/2 + k, 0);
+        ctx.lineTo(w, 0);
+      }
+
+      // Lado derecho (arriba -> abajo)
+      if (right === 0) {
+        ctx.lineTo(w, h);
+      } else {
+        ctx.lineTo(w, h/2 - k);
+        const dir = right;
+        ctx.bezierCurveTo(w, h/2 - k, w + dir*k, h/2 - k, w + dir*r, h/2);
+        ctx.bezierCurveTo(w + dir*k, h/2 + k, w, h/2 + k, w, h/2 + k);
+        ctx.lineTo(w, h);
+      }
+
+      // Lado inferior (der -> izq)
+      if (bottom === 0) {
+        ctx.lineTo(0, h);
+      } else {
+        ctx.lineTo(w/2 + k, h);
+        const dir = bottom;
+        ctx.bezierCurveTo(w/2 + k, h, w/2 + k, h + dir*k, w/2, h + dir*r);
+        ctx.bezierCurveTo(w/2 - k, h + dir*k, w/2 - k, h, w/2 - k, h);
+        ctx.lineTo(0, h);
+      }
+
+      // Lado izquierdo (abajo -> arriba)
+      if (left === 0) {
+        ctx.lineTo(0, 0);
+      } else {
+        ctx.lineTo(0, h/2 + k);
+        const dir = left;
+        ctx.bezierCurveTo(0, h/2 + k, -dir*k, h/2 + k, -dir*r, h/2);
+        ctx.bezierCurveTo(-dir*k, h/2 - k, 0, h/2 - k, 0, h/2 - k);
+        ctx.lineTo(0, 0);
+      }
+      ctx.closePath();
+    }
+
+    function setup(){
+      clearBoard();
+      const congrats = document.getElementById('congrats');
+      if (congrats) congrats.setAttribute('hidden', '');
+
+      // Ajustar márgenes dinámicamente para dejar sitio a los laterales
+      const gap = 12; // espacio entre imagen y piezas laterales
+      let marginX = 140, marginY = 120; // valores de partida
+      for (let iter=0; iter<4; iter++){
+        const tw = board.clientWidth - 2*marginX;
+        const th = board.clientHeight - 2*marginY;
+        const pw = tw / cols, ph = th / rows;
+        const needX = Math.ceil(pw + gap);
+        const needY = Math.ceil(ph + gap);
+        if (needX <= marginX && needY <= marginY) break;
+        if (needX > marginX) marginX = needX;
+        if (needY > marginY) marginY = needY;
+      }
+      // Aplicar márgenes al área objetivo
+      target.style.left = marginX + 'px';
+      target.style.right = marginX + 'px';
+      target.style.top = marginY + 'px';
+      target.style.bottom = marginY + 'px';
+
+      // Medidas finales de la zona objetivo y de pieza
+      const targetW = target.clientWidth; const targetH = target.clientHeight;
+      pieceW = targetW / cols; pieceH = targetH / rows;
+
+      // Guía de fondo con imagen translúcida (cover)
+      guide.style.backgroundImage = `url('${imageSrc}')`;
+
+      // Calcular cómo cubrir la imagen en el target, para usar mismo escalado en piezas
+      const coverRatio = Math.max(targetW / img.width, targetH / img.height);
+      const drawW = img.width * coverRatio; const drawH = img.height * coverRatio;
+      const offsetX = (targetW - drawW) / 2; // centrado
+      const offsetY = (targetH - drawH) / 2;
+
+      // Patrones de piezas con bordes complementarios
+      const patterns = generatePatterns();
+
+      // Crear ranuras (slots) dentro de target
+      for (let r=0; r<rows; r++){
+        for (let c=0; c<cols; c++){
+          const i = r*cols + c;
+          const slot = document.createElement('canvas');
+          slot.className = 'slot';
+          slot.width = pieceW; slot.height = pieceH;
+          slot.style.left = (target.offsetLeft + c*pieceW) + 'px';
+          slot.style.top  = (target.offsetTop  + r*pieceH) + 'px';
+          slot.dataset.index = String(i);
+          const sctx = slot.getContext('2d');
+          sctx.save();
+          drawPieceShape(sctx, pieceW, pieceH, patterns[r][c]);
+          // Borde guía punteado sutil
+          sctx.lineWidth = 2.5; sctx.setLineDash([8,6]); sctx.strokeStyle = '#F2B705';
+          sctx.stroke();
+          sctx.restore();
+          board.appendChild(slot);
+        }
+      }
+
+      // Generar 15 posiciones iniciales alrededor del área objetivo (sin excedentes)
+      const startPositions = [];
+      const ringGap = Math.max(10, Math.round(Math.min(pieceW, pieceH) * 0.1));
+      // 1) 5 arriba
+      for (let cc=0; cc<cols; cc++) {
+        startPositions.push({ x: target.offsetLeft + cc*pieceW, y: target.offsetTop - pieceH - ringGap });
+      }
+      // 2) 5 abajo
+      for (let cc=0; cc<cols; cc++) {
+        startPositions.push({ x: target.offsetLeft + cc*pieceW, y: target.offsetTop + targetH + ringGap });
+      }
+      // 3) 3 izquierda (tres filas)
+      for (let rr=0; rr<rows; rr++) {
+        startPositions.push({ x: target.offsetLeft - pieceW - ringGap, y: target.offsetTop + rr*pieceH });
+      }
+      // 4) 2 derecha (dos filas, dejando libre la última para no exceder)
+      for (let rr=0; rr<rows-1; rr++) {
+        startPositions.push({ x: target.offsetLeft + targetW + ringGap, y: target.offsetTop + rr*pieceH });
+      }
+      // Barajar
+      for (let k = startPositions.length - 1; k > 0; k--) {
+        const j = Math.floor(Math.random() * (k + 1));
+        [startPositions[k], startPositions[j]] = [startPositions[j], startPositions[k]];
+      }
+      // Seguridad: clamp al tablero y evitar superposiciones exactas
+      for (let s of startPositions) {
+        s.x = Math.max(0, Math.min(s.x, board.clientWidth - pieceW));
+        s.y = Math.max(0, Math.min(s.y, board.clientHeight - pieceH));
+      }
+      // Ajuste para garantizar posiciones únicas (evitar que "desaparezcan" por superposición perfecta)
+      const used = new Set();
+      for (let i=0; i<startPositions.length; i++){
+        let s = startPositions[i];
+        let key = `${Math.round(s.x)},${Math.round(s.y)}`;
+        let tries = 0;
+        while (used.has(key) && tries < 20) {
+          // Desplazar ligeramente alternando ejes y direcciones
+          s.x = Math.max(0, Math.min(s.x + (tries % 2 === 0 ? 6 : -6), board.clientWidth - pieceW));
+          s.y = Math.max(0, Math.min(s.y + (tries % 4 < 2 ? 6 : -6), board.clientHeight - pieceH));
+          key = `${Math.round(s.x)},${Math.round(s.y)}`;
+          tries++;
+        }
+        used.add(key);
+      }
+      // Si por algún motivo hay menos de total posiciones, completar de forma segura en la parte superior
+      while (startPositions.length < total) {
+        const y = 0;
+        const x = Math.min(board.clientWidth - pieceW, startPositions.length * (pieceW * 0.66));
+        startPositions.push({x, y});
+      }
+
+      // Crear piezas con la textura de la imagen recortada a la forma
+      for (let r=0; r<rows; r++){
+        for (let c=0; c<cols; c++){
+          const i = r*cols + c;
+          const piece = document.createElement('canvas');
+          piece.className = 'piece';
+          piece.width = pieceW; piece.height = pieceH;
+          piece.setAttribute('draggable', 'false');
+          piece.dataset.index = String(i);
+          // posición inicial centrada dentro del target (barajada)
+          const pos = startPositions[i];
+          piece.style.left = pos.x + 'px';
+          piece.style.top  = pos.y + 'px';
+
+          const pctx = piece.getContext('2d');
+          pctx.save();
+          drawPieceShape(pctx, pieceW, pieceH, patterns[r][c]);
+          pctx.clip();
+          // Dibuja la porción correspondiente de la imagen (alineada al cover del target)
+          pctx.drawImage(
+            img,
+            offsetX - c*pieceW,
+            offsetY - r*pieceH,
+            drawW,
+            drawH
+          );
+          pctx.restore();
+          // Trazo visible para bordes de pieza
+          pctx.save();
+          drawPieceShape(pctx, pieceW, pieceH, patterns[r][c]);
+          pctx.lineWidth = 4; pctx.strokeStyle = '#03658C';
+          pctx.shadowColor = 'rgba(2,36,68,.25)'; pctx.shadowBlur = 6; pctx.shadowOffsetY = 2;
+          pctx.stroke();
+          pctx.restore();
+
+          // Interacción por pointer events (mouse/touch)
+          (function(p){
+            let dragging = false;
+            let offsetX = 0, offsetY = 0;
+            const idx = Number(p.dataset.index);
+            function slotFor(i){ return board.querySelector(`canvas.slot[data-index="${i}"]`); }
+            function clearHighlights(){ board.querySelectorAll('canvas.slot.highlight, canvas.slot.near').forEach(s=>{ s.classList.remove('highlight'); s.classList.remove('near'); }); }
+            function highlight(i, near){ clearHighlights(); const s = slotFor(i); if (!s) return; s.classList.add('highlight'); if (near) s.classList.add('near'); }
+            const snapDist = Math.min(pieceW, pieceH) * 0.6;
+
+            p.addEventListener('pointerdown', (e)=>{
+              if (p.classList.contains('locked')) return;
+              p.setPointerCapture(e.pointerId);
+              dragging = true;
+              const rect = p.getBoundingClientRect();
+              offsetX = e.clientX - rect.left;
+              offsetY = e.clientY - rect.top;
+              p.classList.add('dragging');
+              p.style.zIndex = '5';
+              highlight(idx, false);
+            });
+
+            p.addEventListener('pointermove', (e)=>{
+              if (!dragging) return;
+              const brect = board.getBoundingClientRect();
+              let x = e.clientX - brect.left - offsetX;
+              let y = e.clientY - brect.top  - offsetY;
+              // Limitar al tablero
+              x = Math.max(0, Math.min(x, board.clientWidth - p.width));
+              y = Math.max(0, Math.min(y, board.clientHeight - p.height));
+              p.style.left = x + 'px';
+              p.style.top  = y + 'px';
+
+              // Feedback de cercanía
+              const r = Math.floor(idx / cols), c = (idx % cols);
+              const slotLeft = target.offsetLeft + c*pieceW;
+              const slotTop  = target.offsetTop  + r*pieceH;
+              const slotCx = slotLeft + pieceW/2;
+              const slotCy = slotTop  + pieceH/2;
+              const pcx = x + p.width/2;
+              const pcy = y + p.height/2;
+              const dist = Math.hypot(slotCx - pcx, slotCy - pcy);
+              highlight(idx, dist <= snapDist);
+            });
+
+            p.addEventListener('pointerup', (e)=>{
+              if (!dragging) return;
+              dragging = false;
+              p.releasePointerCapture(e.pointerId);
+              p.classList.remove('dragging');
+              p.style.zIndex = '3';
+              const r = Math.floor(idx / cols), c = (idx % cols);
+              const slotLeft = target.offsetLeft + c*pieceW;
+              const slotTop  = target.offsetTop  + r*pieceH;
+              const slotCx = slotLeft + pieceW/2;
+              const slotCy = slotTop  + pieceH/2;
+              const x = parseFloat(p.style.left);
+              const y = parseFloat(p.style.top);
+              const pcx = x + p.width/2;
+              const pcy = y + p.height/2;
+              const dist = Math.hypot(slotCx - pcx, slotCy - pcy);
+              if (dist <= snapDist){
+                p.style.left = slotLeft + 'px';
+                p.style.top  = slotTop  + 'px';
+                p.classList.add('snap');
+                p.classList.add('locked');
+                done++; doneEl.textContent = String(done);
+                setTimeout(()=> p.classList.remove('snap'), 220);
+                clearHighlights();
+                if (done === total){
+                  stopTimer();
+                  const congrats = document.getElementById('congrats');
+                  if (congrats){
+                    congrats.textContent = '¡Felicitaciones! Rompecabezas completado en ' + timer + ' segundos.';
+                    congrats.removeAttribute('hidden');
+                  }
+                }
+              } else {
+                clearHighlights();
+              }
+            });
+          })(piece);
+
+          board.appendChild(piece);
+        }
+      }
+
+      // Interacción por pointer events (dragging suave y encaje magnético)
+      startTimer();
+    }
+
+    function startTimer(){
+      timerId = setInterval(()=>{ timer++; timeEl.textContent = String(timer); }, 1000);
+    }
+    function stopTimer(){ if (timerId){ clearInterval(timerId); timerId = null; } }
+
+    restartBtn.addEventListener('click', setup);
+  })();
+  </script>
+</body>
+</html>

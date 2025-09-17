@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Términos y Condiciones</title>
+  <meta name="description" content="Términos y condiciones de uso" />
+  <!-- Estilos y recursos globales del sitio -->
+   <link rel="icon" href="imagenes/iconopemsam.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0f172a;        /* slate-900 */
+      --panel: #111827;     /* gray-900 */
+      --text: #e5e7eb;      /* gray-200 */
+      --muted: #9ca3af;     /* gray-400 */
+      --brand: #22c55e;     /* green-500 */
+      --brand-600: #16a34a; /* green-600 */
+      --border: #1f2937;    /* gray-800 */
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(34,197,94,0.15), transparent 55%),
+                  radial-gradient(1000px 500px at 100% 0%, rgba(34,197,94,0.12), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+    }
+
+    .container {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto; /* header (banner) + tyc-top + main + footer */
+    }
+
+    /* Barra de título propia de T&C debajo del banner principal */
+    .tyc-top {
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+      backdrop-filter: blur(6px);
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    .title {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .title-badge {
+      display: inline-flex;
+      width: 28px; height: 28px;
+      align-items: center; justify-content: center;
+      border-radius: 8px;
+      background: rgba(34,197,94,0.15);
+      color: var(--brand);
+      border: 1px solid rgba(34,197,94,0.25);
+      font-weight: 800;
+    }
+
+    main {
+      padding: 10px 0 40px;
+    }
+
+    article {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin: 0 0 10px;
+      letter-spacing: .2px;
+    }
+
+    h2 {
+      margin: 28px 0 12px;
+      font-size: 1.2rem;
+      color: #d1fae5;
+    }
+
+    p, li {
+      color: var(--text);
+      opacity: 0.92;
+    }
+
+    .muted { color: var(--muted); }
+
+    .list {
+      padding-left: 18px;
+    }
+
+    .callout {
+      border-left: 3px solid var(--brand);
+      padding: 10px 12px;
+      background: rgba(34,197,94,0.07);
+      border-radius: 6px;
+      color: #dcfce7; /* green-100 */
+    }
+
+    footer.site-footer {
+      border-top: 1px solid var(--border);
+      background: linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+    }
+
+    .footer-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .redirect-button {
+      appearance: none;
+      border: 1px solid rgba(34,197,94,0.35);
+      background: linear-gradient(180deg, rgba(34,197,94,0.18), rgba(34,197,94,0.12));
+      color: #ecfdf5; /* green-50 */
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 4px 14px rgba(34,197,94,0.18);
+    }
+
+    .redirect-button:hover {
+      background: linear-gradient(180deg, rgba(34,197,94,0.28), rgba(34,197,94,0.20));
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(34,197,94,0.25);
+    }
+
+    .redirect-button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(34,197,94,0.2);
+    }
+
+    .small { font-size: 0.92rem; }
+    .tiny { font-size: 0.82rem; }
+
+    @media (max-width: 640px) {
+      .wrap { padding: 20px 16px; }
+      article { padding: 22px; }
+      .title { font-size: 1.1rem; }
+      h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Página de Términos y Condiciones con banner/navegación del sitio
+    - El footer incluye un enlace de redirección configurable con ?to= en la URL
+  -->
+  <div class="container">
+    <!-- Banner/Navegación del sitio (idéntico a otras páginas) -->
+    <header id="main-header">
+      <div class="brand-row">
+         <img src="imagenes/colsam_logo.svg" alt="Escudo" class="escudo-fijo">
+        <div class="logo">PEMSAM</div>
+      </div>
+      <nav id="main-nav">
+        <a href="index.html">INICIO</a>
+        <a href="nosotros.html">NOSOTROS</a>
+        <a href="juegos.html">ACTIVIDADES</a>
+        <a href="contactanos.html">CONTACTANOS</a>
+        <a href="https://www.colsam.edu.co/" target="_blank" rel="noopener noreferrer">SAN ALBERTO MAGNO</a>
+      </nav>
+      <div class="hamburger" id="hamburger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="dropdown-menu" id="dropdown-menu">
+        <a href="index.html">INICIO</a>
+        <a href="nosotros.html">NOSOTROS</a>
+        <a href="juegos.html">ACTIVIDADES</a>
+        <a href="contactanos.html">CONTACTANOS</a>
+        <a href="https://www.colsam.edu.co/" target="_blank" rel="noopener noreferrer">SAN ALBERTO MAGNO</a>
+      </div>
+      <div id="menu-backdrop" class="menu-backdrop" aria-hidden="true"></div>
+    </header>
+
+    <!-- Barra de título de la página de T&C -->
+    <section class="tyc-top">
+      <div class="wrap">
+        <div class="title" aria-label="Encabezado de Términos y Condiciones">
+          <span class="title-badge" aria-hidden="true">T&C</span>
+          <span>Términos y Condiciones</span>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <div class="wrap">
+        <article aria-labelledby="tyc-title">
+          <h1 id="tyc-title">Términos y Condiciones de Uso</h1>
+          <p class="muted small">Lee detenidamente estos términos antes de utilizar el servicio. Este documento establece las reglas y obligaciones que rigen el uso de la plataforma.</p>
+
+          <h2>1. Aceptación de los términos</h2>
+          <p>Al acceder o utilizar el servicio, aceptas quedar vinculado por estos Términos y Condiciones y por nuestra Política de Privacidad. Si no estás de acuerdo, no debes utilizar el servicio.</p>
+
+          <h2>2. Modificaciones</h2>
+          <p>Podemos actualizar estos términos periódicamente. Publicaremos cualquier cambio en esta página e indicaremos la fecha de la última actualización. El uso continuado del servicio tras las modificaciones implica tu aceptación de los términos actualizados.</p>
+
+          <h2>3. Uso del servicio</h2>
+          <ul class="list">
+            <li>No debes utilizar el servicio para fines ilícitos o no autorizados.</li>
+            <li>No intentes interferir con la seguridad o integridad del sistema.</li>
+            <li>Respetarás los derechos de propiedad intelectual y las políticas publicadas.</li>
+          </ul>
+
+          <h2>4. Cuentas y seguridad</h2>
+          <p>Eres responsable de mantener la confidencialidad de tus credenciales y de toda actividad realizada en tu cuenta. Notifícanos de inmediato cualquier acceso no autorizado.</p>
+
+          <h2>5. Propiedad intelectual</h2>
+          <p>Todos los contenidos, marcas, logotipos y software asociados al servicio están protegidos por leyes de propiedad intelectual. No se concede licencia alguna salvo lo expresamente indicado.</p>
+
+          <h2>6. Limitación de responsabilidad</h2>
+          <p>El servicio se proporciona "tal cual" y "según disponibilidad". En la medida permitida por la ley, no garantizamos que el servicio sea ininterrumpido, libre de errores o completamente seguro, ni seremos responsables por daños indirectos o consecuenciales.</p>
+
+          <h2>7. Privacidad</h2>
+          <p>El tratamiento de tus datos personales se rige por nuestra Política de Privacidad. Revisa ese documento para conocer cómo recopilamos, usamos y protegemos la información.</p>
+
+          <h2>8. Ley aplicable y jurisdicción</h2>
+          <p>Estos términos se regirán e interpretarán de acuerdo con las leyes aplicables en tu jurisdicción local, salvo que se especifique lo contrario. Cualquier disputa se someterá a los tribunales competentes.</p>
+
+          <h2>9. Contacto</h2>
+          <p>Si tienes preguntas sobre estos términos, puedes contactarnos a través del correo: soporte@ejemplo.com</p>
+
+          <div class="callout tiny" role="note" aria-label="Nota informativa">
+            Este es un texto de ejemplo. Sustituye, agrega o elimina secciones según tus necesidades legales y las particularidades de tu servicio.
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-grid">
+        <p class="muted small">¿Terminaste de leer los Términos y Condiciones?</p>
+        <nav aria-label="Redirección desde el pie de página">
+          <a id="redirect-link" class="redirect-button" href="index.html" rel="noopener">Volver al inicio</a>
+          <a href="faqs.html" class="redirect-button">FAQS</a>
+        </nav>
+        <div class="social-links">
+          <a href="https://www.facebook.com/colegiosanalbertomagnobarranquilla/" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/colsambarranquilla/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="wrap">
+        <p class="tiny muted" style="margin-top:12px;">Última actualización: 01/09/2025</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Mostrar footer cuando entra al viewport
+    (function(){
+      try{
+        var footer = document.querySelector('.site-footer');
+        if(!footer) return;
+        var obs = new IntersectionObserver(function(entries, o){
+          entries.forEach(function(e){ if(e.isIntersecting){ footer.classList.add('is-visible'); o.unobserve(e.target); } });
+        }, { threshold: 0.15 });
+        obs.observe(footer);
+      }catch(e){}
+    })();
+  </script>
+
+  <script>
+    // Lógica de header (sticky, menú hamburguesa, backdrop) igual que en el sitio
+    (function(){
+      const header = document.getElementById('main-header');
+      const nav = document.getElementById('main-nav');
+      const hamburger = document.getElementById('hamburger-menu');
+      const dropdown = document.getElementById('dropdown-menu');
+      const backdrop = document.getElementById('menu-backdrop');
+
+      let ticking = false;
+      function handleHeaderScroll() {
+        if(window.scrollY > 50) {
+          header.classList.add('sticky');
+          header.classList.add('animated-scroll');
+          nav.classList.add('hide');
+          hamburger.classList.add('show');
+        } else {
+          header.classList.remove('sticky');
+          header.classList.remove('animated-scroll');
+          nav.classList.remove('hide');
+          hamburger.classList.remove('show');
+          dropdown.classList.remove('show');
+          hamburger.classList.remove('active');
+          if (backdrop) backdrop.classList.remove('show');
+        }
+      }
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => { handleHeaderScroll(); ticking = false; });
+          ticking = true;
+        }
+      });
+      function openMenu(){ dropdown.classList.add('show'); hamburger.classList.add('active'); backdrop.classList.add('show'); }
+      function closeMenu(){ dropdown.classList.remove('show'); hamburger.classList.remove('active'); backdrop.classList.remove('show'); }
+      if (hamburger) hamburger.addEventListener('click', () => { if (dropdown.classList.contains('show')) { closeMenu(); } else { openMenu(); } });
+      document.querySelectorAll('#dropdown-menu a').forEach(a=>{ a.addEventListener('click', ()=> closeMenu()); });
+      if (backdrop) backdrop.addEventListener('click', closeMenu);
+      window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMenu(); });
+      // Inicializar estado al cargar
+      handleHeaderScroll();
+    })();
+  </script>
+  <script>
+    (function () {
+      // Personalizar destino del enlace del footer mediante ?to= o ?redirect=
+      try {
+        var url = new URL(window.location.href);
+        var to = url.searchParams.get('to') || url.searchParams.get('redirect');
+        var link = document.getElementById('redirect-link');
+        if (to && link) {
+          var resolved = new URL(to, window.location.origin);
+          link.href = resolved.href;
+        }
+      } catch (e) {
+        // Silencioso
+      }
+    })();
+  </script>
+</body>
+</html>
