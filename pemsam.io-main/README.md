@@ -1,2 +1,0 @@
-# PEMSAM
-proyecto de grado
